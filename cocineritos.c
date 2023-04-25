@@ -39,6 +39,27 @@ const int CANTIDAD_INGREDIENTES_ENSALADA = 2;
 const int CANTIDAD_INGREDIENTES_PIZZA = 3;
 
 
+// Pos: Devuelve una posicion randon en el primer cuadrante, solo toma lugares libres (sin pared, solo vacio) 
+void aleatorizar_numeros_primer_cuadrante(char nivel[MAX_FIL][MAX_COL],int* numero_fila_random,int* numero_columna_random) {
+  (*numero_fila_random) = rand() % 9 + 1;
+  (*numero_columna_random) = rand() % 19 + 1;
+
+   while(nivel[*numero_fila_random][*numero_columna_random] != VACIO){
+     (*numero_fila_random) = rand() % 9 + 1;
+     (*numero_columna_random) = rand() % 19 + 1;
+   }
+}
+
+void aleatorizar_numeros_segundo_cuadrante(char nivel[MAX_FIL][MAX_COL], int* numero_fila_random, int* numero_columna_random) {
+  (*numero_fila_random) = rand() % 9 + 10; 
+  (*numero_columna_random) = rand() % 19 + 1;
+
+   while(nivel[*numero_fila_random][*numero_columna_random] != VACIO){
+     (*numero_fila_random) = rand() % 8 + 12;
+     (*numero_columna_random) = rand() % 19 + 1;
+   }
+}
+
 // pre:
 // pos: crea una matriz 21x21 con sus respectivas paredes y piso,
 void inicializar_nivel_vacio_y_paredes(char nivel[MAX_FIL][MAX_COL]) {
@@ -68,80 +89,58 @@ void inicializar_nivel_vacio_y_paredes(char nivel[MAX_FIL][MAX_COL]) {
 void añadir_obstaculos_mesa_y_salida(char nivel[MAX_FIL][MAX_COL]) {
   int cant_agujeros_arriba = 0;
   int cant_agujeros_abajo = 0;
+  int num_fila_aleatorio = 0;
+  int num_col_aleatorio = 0;
 
    //añado 10 obstaculos aleatorios en el cuadrante superior
-    for (int i = 0; i < MITAD_DE_FILAS_TOTAL; i++){
-    for (int j = 0; j < MAX_COL; j++){
- if(cant_agujeros_arriba <= OBSTACULOS_POR_CUADRANTE) {
-        int num_fila_aleatorio = rand() % 10 + 0;
-        int num_col_aleatorio = rand() % 20 + 0;
-
-   if(nivel[num_fila_aleatorio][num_col_aleatorio] != PARED){
+  while(cant_agujeros_arriba < 10){
+      aleatorizar_numeros_primer_cuadrante(nivel, &num_fila_aleatorio, &num_col_aleatorio);
       nivel[num_fila_aleatorio][num_col_aleatorio] = AGUJERO;
       cant_agujeros_arriba += 1;
-      }
+  }
 
       
-    }
-  }
- }
 
-// añado 10 obstaculos aleatorios en el cuadrante inferior
- for (int i = MITAD_DE_FILAS_TOTAL; i <= MAX_FIL; i++){
-  for (int j = 0; j < MAX_COL; j++){
- if(cant_agujeros_abajo < OBSTACULOS_POR_CUADRANTE) {
-        int num_fila_aleatorio = rand() % 10 + 11;
-        int num_col_aleatorio = rand() % 20 + 0;
 
-   if(nivel[num_fila_aleatorio][num_col_aleatorio] != PARED){
+   // añado 10 obstaculos aleatorios en el cuadrante inferior
+
+   while(cant_agujeros_abajo < 10) {
+      aleatorizar_numeros_segundo_cuadrante(nivel, &num_fila_aleatorio, &num_col_aleatorio);
       nivel[num_fila_aleatorio][num_col_aleatorio] = AGUJERO;
       cant_agujeros_abajo += 1;
-      }
-    }
   }
- }
-
-    nivel[10][MITAD_DE_COLUMNAS] = MESA;
-    nivel[20][MITAD_DE_COLUMNAS] = SALIDA;
-
+  nivel[10][MITAD_DE_COLUMNAS] = MESA;
+  nivel[20][MITAD_DE_COLUMNAS] = SALIDA;
 }
 
 void añadir_herramientas(char nivel[MAX_FIL][MAX_COL]){
  int cant_cuchillos = 0;
  int cant_hornos = 0;
+  int num_fila_aleatorio = 0;
+  int num_col_aleatorio = 0;
 
-// añado 2 cuchillos de forma aleatoria  en el cuadrante superior
-   for (int i = 0; i < MITAD_DE_FILAS_TOTAL; i++){
-  for (int j = 0; j < MAX_COL; j++){
- if(cant_cuchillos < 2) {
-        int num_fila_aleatorio = rand() % 10 + 0;
-        int num_col_aleatorio = rand() % 20 + 0;
+  // añado 2 cuchillos de forma aleatoria  en el cuadrante superior
+ while(cant_cuchillos < 2) {
 
-   if(nivel[num_fila_aleatorio][num_col_aleatorio] != PARED && nivel[num_fila_aleatorio][num_col_aleatorio] != AGUJERO){
-      nivel[num_fila_aleatorio][num_col_aleatorio] = CUCHILLO;
-      cant_cuchillos += 1;
-      }
-    }
+  aleatorizar_numeros_primer_cuadrante(nivel, &num_fila_aleatorio, &num_col_aleatorio);
+  nivel[num_fila_aleatorio][num_col_aleatorio] = CUCHILLO;
+  cant_cuchillos += 1;
+      
   }
- }
+  
+  // añado 2 hornos de forma aleatoria en el cuadrante inferior
+  while(cant_hornos < 2) {
 
-// añado 2 hornos de forma aleatoria en el cuadrante inferior
-  for (int i = MITAD_DE_FILAS_TOTAL; i <= MAX_FIL; i++){
-  for (int j = 0; j < MAX_COL; j++){
- if(cant_hornos < 2) {
-        int num_fila_aleatorio = rand() % 10 + 11;
-        int num_col_aleatorio = rand() % 20 + 0;
-
-   if(nivel[num_fila_aleatorio][num_col_aleatorio] != PARED && nivel[num_fila_aleatorio][num_col_aleatorio] != AGUJERO && nivel[num_fila_aleatorio][num_col_aleatorio] != CUCHILLO){
-      nivel[num_fila_aleatorio][num_col_aleatorio] = HORNO;
-      cant_hornos += 1;
-      }
-    }
+  aleatorizar_numeros_segundo_cuadrante(nivel, &num_fila_aleatorio, &num_col_aleatorio);
+  nivel[num_fila_aleatorio][num_col_aleatorio] = HORNO;
+  cant_hornos += 1;
+      
   }
- }
-
-
 }
+
+ 
+
+
 
 void añadir_ensalada(char nivel[MAX_FIL][MAX_COL]) {
   int cant_lechuga = 0;
@@ -166,37 +165,26 @@ void añadir_ensalada(char nivel[MAX_FIL][MAX_COL]) {
 
 void añadir_pizza(char nivel[MAX_FIL][MAX_COL]) {
 
-  int cant_jamon = 0;
-  int cant_queso = 0;
+  int cantidad_de_ingredientes_total = 0;
+  int numero_fila_random_primer_cuadrante = 0;
+  int numero_columna_random_primer_cuadrante = 0;
+  int numero_fila_random_segundo_cuadrante = 0;
+  int numero_columna_random_segundo_cuadrante = 0;
 
-  for(int i = 0; i < CANTIDAD_INGREDIENTES_PIZZA; i++) {
-    // hacerlo 1 procedimiento
-   int numero_fila_random_primer_cuadrante = rand() % 9 + 1;
-   int numero_columna_random_primer_cuadrante = rand() % 19 + 1;
+  while(cantidad_de_ingredientes_total < CANTIDAD_INGREDIENTES_PIZZA) {
 
-   while(nivel[numero_fila_random_primer_cuadrante][numero_columna_random_primer_cuadrante] != VACIO){
-     numero_fila_random_primer_cuadrante = rand() % 9 + 1;
-     numero_columna_random_primer_cuadrante = rand() % 19 + 1;
-   }
-//
-    // hacerlo 1 procedimiento
-     int numero_fila_random_segundo_cuadrante = rand() % 9 + 10;
-   int numero_columna_random_segundo_cuadrante = rand() % 19 + 1;
+   aleatorizar_numeros_primer_cuadrante(nivel, &numero_fila_random_primer_cuadrante, &numero_columna_random_primer_cuadrante);
+   aleatorizar_numeros_segundo_cuadrante(nivel, &numero_fila_random_segundo_cuadrante, &numero_columna_random_segundo_cuadrante);
 
-   while(nivel[numero_fila_random_segundo_cuadrante][numero_columna_random_segundo_cuadrante] != VACIO){
-     numero_fila_random_segundo_cuadrante = rand() % 9 + 1;
-     numero_columna_random_segundo_cuadrante = rand() % 19 + 1;
-   }
-// 
-
-   if(cant_jamon < 1) {
+   if(cantidad_de_ingredientes_total < 1) {
     nivel[numero_fila_random_primer_cuadrante][numero_columna_random_primer_cuadrante] = JAMON;
-    cant_jamon ++;
-   } else if (cant_queso < 1) {
+    cantidad_de_ingredientes_total ++;
+   } else if (cantidad_de_ingredientes_total < 2) {
     nivel[numero_fila_random_primer_cuadrante][numero_columna_random_primer_cuadrante] = QUESO;
-    cant_queso ++;
+    cantidad_de_ingredientes_total ++;
    } else {
     nivel[numero_fila_random_segundo_cuadrante][numero_columna_random_segundo_cuadrante] = MASA;
+    cantidad_de_ingredientes_total ++;
    }
   }
 
