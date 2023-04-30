@@ -101,9 +101,10 @@ bool hay_obstaculo(juego_t* juego, int numero_fila_random, int numero_columna_ra
 
 void anadir_obstaculos(juego_t* juego) {
  (*juego).tope_obstaculos = 0;
- 
+ int cantidad_obstaculos = 0;
+
   // añade 10 obstaculos al primer cuadrante
-  while((*juego).tope_obstaculos < MAX_OBSTACULOS_POR_CUADRANTE) {
+  while(cantidad_obstaculos < MAX_OBSTACULOS_POR_CUADRANTE) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   while(hay_pared(juego, numero_fila_random, numero_columna_random)){
@@ -111,13 +112,13 @@ void anadir_obstaculos(juego_t* juego) {
   (*juego).obstaculos[numero_fila_random].posicion.col = numero_columna_random;
   (*juego).obstaculos[numero_fila_random].tipo = AGUJERO;
   (*juego).tope_obstaculos ++;
+  cantidad_obstaculos ++;
   }
   }
 
-(*juego).tope_obstaculos = 0;
 
   //añade 10 obstaculos al 2do cuadrante
-  while((*juego).tope_obstaculos < MAX_OBSTACULOS_POR_CUADRANTE) {
+  while(cantidad_obstaculos < MAX_OBSTACULOS_TOTAL) {
   int numero_fila_random = rand() % 9 + 10; 
   int numero_columna_random = rand() % 19 + 1;
   while(hay_pared(juego, numero_fila_random, numero_columna_random)){
@@ -125,14 +126,16 @@ void anadir_obstaculos(juego_t* juego) {
   (*juego).obstaculos[numero_fila_random].posicion.col = numero_columna_random;
   (*juego).obstaculos[numero_fila_random].tipo = AGUJERO;
   (*juego).tope_obstaculos ++;
+  cantidad_obstaculos ++;
   }
   }
 }
 
 void anadir_herramientas(juego_t* juego) {
 (*juego).tope_herramientas = 0;
+int cantidad_herramientas = 0;
 
-while((*juego).tope_herramientas < MAX_CUCHILLOS){
+while(cantidad_herramientas < MAX_CUCHILLOS){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
@@ -140,12 +143,12 @@ while((*juego).tope_herramientas < MAX_CUCHILLOS){
     (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
     (*juego).herramientas[numero_fila_random].tipo = CUCHILLO;
     (*juego).tope_herramientas ++;
+    cantidad_herramientas ++;
   }
 }
 
-(*juego).tope_herramientas = 0;
 
-while((*juego).tope_herramientas < MAX_HORNOS){
+while(cantidad_herramientas < 4){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
@@ -153,6 +156,8 @@ while((*juego).tope_herramientas < MAX_HORNOS){
     (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
     (*juego).herramientas[numero_fila_random].tipo = HORNO;
     (*juego).tope_herramientas ++;
+    cantidad_herramientas ++;
+
   }
 }
 
