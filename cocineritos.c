@@ -47,7 +47,8 @@ const int POSICION_FILA_REUBEN = 5;
 const int POSICION_COLUMNA_REUBEN = 10;
 const int MAX_OBSTACULOS_POR_CUADRANTE = 10;
 const int MAX_OBSTACULOS_TOTAL = 20;
-
+const int MAX_CUCHILLOS = 2;
+const int MAX_HORNOS = 2;
 
 // pre:
 // pos: Añade la localizacion de las paredes al struct juego_t juego
@@ -84,6 +85,19 @@ bool hay_pared(juego_t* juego,int numero_fila_random, int numero_columna_random)
  return ocupado;
 }
 
+bool hay_obstaculo(juego_t* juego, int numero_fila_random, int numero_columna_random) {
+  bool ocupado = false;
+  for(int i = 0; i < MAX_FIL; i++){
+    if((*juego).obstaculos[i].posicion.fil == numero_fila_random && (*juego).obstaculos[i].posicion.col == numero_columna_random) {
+      ocupado = false;
+    } else {
+      ocupado = true;
+    }
+   }
+
+  return ocupado;
+}
+
 
 void anadir_obstaculos(juego_t* juego) {
  (*juego).tope_obstaculos = 0;
@@ -100,8 +114,10 @@ void anadir_obstaculos(juego_t* juego) {
   }
   }
 
+(*juego).tope_obstaculos = 0;
+
   //añade 10 obstaculos al 2do cuadrante
-  while((*juego).tope_obstaculos < MAX_OBSTACULOS_TOTAL) {
+  while((*juego).tope_obstaculos < MAX_OBSTACULOS_POR_CUADRANTE) {
   int numero_fila_random = rand() % 9 + 10; 
   int numero_columna_random = rand() % 19 + 1;
   while(hay_pared(juego, numero_fila_random, numero_columna_random)){
@@ -112,6 +128,53 @@ void anadir_obstaculos(juego_t* juego) {
   }
   }
 }
+
+void anadir_herramientas(juego_t* juego) {
+(*juego).tope_herramientas = 0;
+
+while((*juego).tope_herramientas < MAX_CUCHILLOS){
+  int numero_fila_random = rand() % 9 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
+    (*juego).herramientas[numero_fila_random].posicion.fil = numero_fila_random;
+    (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
+    (*juego).herramientas[numero_fila_random].tipo = CUCHILLO;
+    (*juego).tope_herramientas ++;
+  }
+}
+
+(*juego).tope_herramientas = 0;
+
+while((*juego).tope_herramientas < MAX_HORNOS){
+  int numero_fila_random = rand() % 9 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
+    (*juego).herramientas[numero_fila_random].posicion.fil = numero_fila_random;
+    (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
+    (*juego).herramientas[numero_fila_random].tipo = HORNO;
+    (*juego).tope_herramientas ++;
+  }
+}
+
+}
+
+void anadir_ingredientes(juego_t* juego, int precio){
+
+ if(precio <= CATEGORIA_PRECIO_1){
+
+ } else if(CATEGORIA_PRECIO_1 < precio && precio <= CATEGORIA_PRECIO_2) {
+
+ } else if(precio > CATEGORIA_PRECIO_2){
+  
+ }
+
+}
+
+
+
+
+
+
 
 /* void anadir_personajes_mesa_y_salida(juego_t* juego){
 
@@ -127,11 +190,13 @@ void anadir_obstaculos(juego_t* juego) {
 
 } */
 
-void inicializar_juego(juego_t* juego) {
+void inicializar_juego(juego_t* juego, int precio) {
 
 
   inicializar_nivel_paredes(juego);
   anadir_obstaculos(juego);
+  anadir_herramientas(juego);
+  anadir_ingredientes(juego, precio);
  // anadir_personajes_mesa_y_salida(juego);
 
 
