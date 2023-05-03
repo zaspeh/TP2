@@ -73,30 +73,43 @@ void inicializar_nivel_paredes(juego_t* juego) {
 }
 
 bool hay_pared(juego_t* juego,int numero_fila_random, int numero_columna_random){
-  bool ocupado = false;
+  bool libre = false;
 
   for(int i = 0; i < MAX_FIL; i++){
     if((*juego).paredes[i].fil == numero_fila_random && (*juego).paredes[i].col == numero_columna_random) {
-      ocupado = false;
+      libre = false;
     } else {
-      ocupado = true;
+      libre = true;
     }
   }
- return ocupado;
+ return libre;
 }
 
 bool hay_obstaculo(juego_t* juego, int numero_fila_random, int numero_columna_random) {
-  bool ocupado = false;
+  bool libre = false;
   for(int i = 0; i < MAX_FIL; i++){
     if((*juego).obstaculos[i].posicion.fil == numero_fila_random && (*juego).obstaculos[i].posicion.col == numero_columna_random) {
-      ocupado = false;
+      libre = false;
     } else {
-      ocupado = true;
+      libre = true;
     }
    }
 
-  return ocupado;
+  return libre;
 }
+
+bool hay_herramienta(juego_t* juego, int numero_fila_random, int numero_columna_random) {
+  bool libre = false;
+  for(int i = 0; i < MAX_FIL; i++){
+    if((*juego).herramientas[i].posicion.fil == numero_fila_random && (*juego).herramientas[i].posicion.col == numero_columna_random) {
+      libre = false;
+    } else {
+      libre = true;
+    }
+  }
+  return libre;
+}
+
 
 
 void anadir_obstaculos(juego_t* juego) {
@@ -107,7 +120,7 @@ void anadir_obstaculos(juego_t* juego) {
   while(cantidad_obstaculos < MAX_OBSTACULOS_POR_CUADRANTE) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  while(hay_pared(juego, numero_fila_random, numero_columna_random)){
+  if(hay_pared(juego, numero_fila_random, numero_columna_random)){
   (*juego).obstaculos[numero_fila_random].posicion.fil = numero_fila_random;
   (*juego).obstaculos[numero_fila_random].posicion.col = numero_columna_random;
   (*juego).obstaculos[numero_fila_random].tipo = AGUJERO;
@@ -121,7 +134,7 @@ void anadir_obstaculos(juego_t* juego) {
   while(cantidad_obstaculos < MAX_OBSTACULOS_TOTAL) {
   int numero_fila_random = rand() % 9 + 10; 
   int numero_columna_random = rand() % 19 + 1;
-  while(hay_pared(juego, numero_fila_random, numero_columna_random)){
+  if(hay_pared(juego, numero_fila_random, numero_columna_random)){
   (*juego).obstaculos[numero_fila_random].posicion.fil = numero_fila_random;
   (*juego).obstaculos[numero_fila_random].posicion.col = numero_columna_random;
   (*juego).obstaculos[numero_fila_random].tipo = AGUJERO;
@@ -138,7 +151,7 @@ int cantidad_herramientas = 0;
 while(cantidad_herramientas < MAX_CUCHILLOS){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
+  if(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
     (*juego).herramientas[numero_fila_random].posicion.fil = numero_fila_random;
     (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
     (*juego).herramientas[numero_fila_random].tipo = CUCHILLO;
@@ -151,7 +164,7 @@ while(cantidad_herramientas < MAX_CUCHILLOS){
 while(cantidad_herramientas < 4){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  while(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
+  if(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random)){
     (*juego).herramientas[numero_fila_random].posicion.fil = numero_fila_random;
     (*juego).herramientas[numero_fila_random].posicion.col = numero_columna_random;
     (*juego).herramientas[numero_fila_random].tipo = HORNO;
@@ -163,7 +176,38 @@ while(cantidad_herramientas < 4){
 
 }
 
-void anadir_ingredientes(juego_t* juego, int precio){
+void anadir_ensalada(juego_t* juego) {
+  int cantidad_ingredientes = 0;
+  (*juego).tope_comida = 0;
+
+  while(cantidad_ingredientes < 1) {
+  int numero_fila_random = rand() % 9 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  if(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random) && hay_herramienta(juego, numero_fila_random, numero_columna_random)){
+  (*juego).comida[numero_fila_random].ingrediente[numero_fila_random].posicion.fil = numero_fila_random;
+  (*juego).comida[numero_fila_random].ingrediente[numero_fila_random].posicion.col = numero_columna_random;
+  (*juego).comida[numero_fila_random].tipo = LECHUGA;
+  cantidad_ingredientes++;
+  }
+
+  }
+  while(cantidad_ingredientes < 2) {
+  int numero_fila_random = rand() % 9 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  if(hay_pared(juego, numero_fila_random, numero_columna_random) && hay_obstaculo(juego, numero_fila_random, numero_columna_random) && hay_herramienta(juego, numero_fila_random, numero_columna_random)){
+  (*juego).comida[numero_fila_random].ingrediente[numero_fila_random].posicion.fil = numero_fila_random;
+  (*juego).comida[numero_fila_random].ingrediente[numero_fila_random].posicion.col = numero_columna_random;
+  (*juego).comida[numero_fila_random].tipo = TOMATE;
+  cantidad_ingredientes++;
+
+  (*juego).tope_comida ++;
+  }
+
+
+  }
+}
+
+/* void anadir_ingredientes(juego_t* juego, int precio){
 
  if(precio <= CATEGORIA_PRECIO_1){
 
@@ -173,11 +217,43 @@ void anadir_ingredientes(juego_t* juego, int precio){
   
  }
 
+} */
+
+
+void limpiar_matriz(char matriz[MAX_FIL][MAX_COL]){
+
+    // primero lo lleno de "vacio"
+    for(int i = 0; i < MAX_FIL; i ++){
+        for (int j = 0; j < MAX_COL; j++){
+        matriz[i][j] = VACIO;
+        }
+        
+    }
+  
 }
 
+void anadir_elementos_en_matriz(juego_t* juego, char matriz[MAX_FIL][MAX_COL]) {
+  for(int i = 0; i < MAX_FIL; i++) {
+    for(int j = 0; j < MAX_COL; j++) {
+     if((*juego).paredes[i].fil == i && (*juego).paredes[i].col == j){
+     matriz[i][j] = PARED;
+    } 
+
+  }
 
 
+}
+}
 
+void mostrar_nivel(char matriz[MAX_FIL][MAX_COL]) {
+    for (int i = 0; i <= MAX_FIL; i++){
+     for (int j = 0; j <= MAX_COL; j++){
+        printf("%c", matriz[i][j]);
+     }
+     printf("\n");
+    }
+    
+}
 
 
 
@@ -196,15 +272,16 @@ void anadir_ingredientes(juego_t* juego, int precio){
 } */
 
 void inicializar_juego(juego_t* juego, int precio) {
-
+ char matriz[MAX_FIL][MAX_COL];
 
   inicializar_nivel_paredes(juego);
   anadir_obstaculos(juego);
   anadir_herramientas(juego);
-  anadir_ingredientes(juego, precio);
+  // anadir_ingredientes(juego, precio);
  // anadir_personajes_mesa_y_salida(juego);
 
 
 
-
+  limpiar_matriz(matriz);
+  mostrar_nivel(matriz);
 }
