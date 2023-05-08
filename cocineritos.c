@@ -106,7 +106,7 @@ bool puedo_agregar(int numero_fila_random, int numero_columna_random){
 }
 
 
-bool hay_pared(juego_t juego,int numero_fila_random, int numero_columna_random){
+bool no_hay_pared(juego_t juego,int numero_fila_random, int numero_columna_random){
   bool libre = true;
 
   for(int i = 0; i < juego.tope_paredes; i++){
@@ -117,7 +117,7 @@ bool hay_pared(juego_t juego,int numero_fila_random, int numero_columna_random){
  return libre;
 }
 
-bool hay_obstaculo(juego_t juego, int numero_fila_random, int numero_columna_random) {
+bool no_hay_obstaculo(juego_t juego, int numero_fila_random, int numero_columna_random) {
   bool libre = true;
   for(int i = 0; i < juego.tope_obstaculos; i++){
     if(juego.obstaculos[i].posicion.fil == numero_fila_random && juego.obstaculos[i].posicion.col == numero_columna_random) {
@@ -128,7 +128,7 @@ bool hay_obstaculo(juego_t juego, int numero_fila_random, int numero_columna_ran
   return libre;
 }
 
-bool hay_herramienta(juego_t juego, int numero_fila_random, int numero_columna_random) {
+bool no_hay_herramienta(juego_t juego, int numero_fila_random, int numero_columna_random) {
   bool libre = true;
   for(int i = 0; i < juego.tope_herramientas; i++){
     if(juego.herramientas[i].posicion.fil == numero_fila_random && juego.herramientas[i].posicion.col == numero_columna_random) {
@@ -152,7 +152,7 @@ void anadir_obstaculos(juego_t* juego) {
   while((*juego).tope_obstaculos < 10) {
   int numero_fila_random = rand() % 8 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
   (*juego).obstaculos[(*juego).tope_obstaculos].posicion.fil = numero_fila_random;
   (*juego).obstaculos[(*juego).tope_obstaculos].posicion.col = numero_columna_random;
   (*juego).obstaculos[(*juego).tope_obstaculos].tipo = AGUJERO;
@@ -165,7 +165,7 @@ void anadir_obstaculos(juego_t* juego) {
   while((*juego).tope_obstaculos < 20) {
   int numero_fila_random = rand() % 8 + 12; 
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
   (*juego).obstaculos[(*juego).tope_obstaculos].posicion.fil = numero_fila_random;
   (*juego).obstaculos[(*juego).tope_obstaculos].posicion.col = numero_columna_random;
   (*juego).obstaculos[(*juego).tope_obstaculos].tipo = AGUJERO;
@@ -181,7 +181,7 @@ void anadir_herramientas(juego_t* juego) {
 while((*juego).tope_herramientas < MAX_CUCHILLOS){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
     (*juego).herramientas[(*juego).tope_herramientas].posicion.fil = numero_fila_random;
     (*juego).herramientas[(*juego).tope_herramientas].posicion.col = numero_columna_random;
     (*juego).herramientas[(*juego).tope_herramientas].tipo = CUCHILLO;
@@ -194,7 +194,7 @@ while((*juego).tope_herramientas < MAX_CUCHILLOS){
 while((*juego).tope_herramientas < 4){
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
     (*juego).herramientas[(*juego).tope_herramientas].posicion.fil = numero_fila_random;
     (*juego).herramientas[(*juego).tope_herramientas].posicion.col = numero_columna_random;
     (*juego).herramientas[(*juego).tope_herramientas].tipo = HORNO;
@@ -219,7 +219,7 @@ void anadir_mesa_y_salida(juego_t* juego) {
   while((*juego).comida->tope_ingredientes < 1) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
   (*juego).comida[(*juego).tope_comida].tipo = LECHUGA;
@@ -230,7 +230,7 @@ void anadir_mesa_y_salida(juego_t* juego) {
   while((*juego).comida->tope_ingredientes < 2) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  if(hay_pared(*juego, numero_fila_random, numero_columna_random) && hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
+  if(no_hay_pared(*juego, numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
   (*juego).comida[(*juego).tope_comida].tipo = TOMATE;
@@ -383,34 +383,53 @@ void imprimir_terreno(juego_t* juego){
 }
 
 
-
-
-
-
-void realizar_jugada(juego_t* juego, char* movimiento) {
-  int cant_movimientos = 0;
-  while(cant_movimientos < 10) {
-  printf("¿Que movimiento desea hacer?\n");
-  scanf(" %c", movimiento);
-  if((*movimiento == MOVER_DERECHA) && (hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1))) {
+void chequear_pared(juego_t* juego, char* movimiento, int* cant_movimientos){
+    if((*movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1))) {
     (*juego).stitch.posicion.col ++;
     cant_movimientos ++;
     imprimir_terreno(juego);
-  } else if ((*movimiento == MOVER_IZQUIERDA) && (hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1))){
+  } else if ((*movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1))){
     (*juego).stitch.posicion.col --;
     cant_movimientos ++;
     imprimir_terreno(juego);
-  } else if((*movimiento == MOVER_ABAJO) && (hay_pared(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col))){
+  } else if((*movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col))){
     (*juego).stitch.posicion.fil ++;
     cant_movimientos ++;
     imprimir_terreno(juego);
-  } else if((*movimiento == MOVER_ARRIBA) && (hay_pared(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col))) {
+  } else if((*movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col))) {
     (*juego).stitch.posicion.fil --;
     cant_movimientos ++;
     imprimir_terreno(juego);
-  } else {
+  } else{
     imprimir_terreno(juego);
     printf("Ni intentando mil años podrias meterte en la pared!\n");
   }
  }
+
+
+void chequear_obstaculo(juego_t* juego, char* movimiento, int* cant_movimientos){
+    if(!no_hay_obstaculo(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col)) {
+         printf("COMO NO LO VISTE?!?!? CAÌSTE EN UN AGUJERO. PERDISTE :( \n");
+         *cant_movimientos = 25;
+    }
+ }
+/*
+void chequear_herramienta(juego_t* juego, char* movimiento, int* cant_movimientos){
+  if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && (*movimiento == CUCHILLO) && tener el ingrediente en la mano){
+   
+  }
+}
+*/
+
+
+void realizar_jugada(juego_t* juego, char* movimiento) {
+  int cant_movimientos = 0;
+  while(cant_movimientos < 25) {
+  printf("¿Que movimiento desea hacer?\n");
+  scanf(" %c", movimiento);
+  chequear_pared(juego, movimiento, &cant_movimientos);
+  chequear_obstaculo(juego, movimiento, &cant_movimientos);
+  chequear_herramienta(juego, movimiento);
+  }
+  printf("Desea jugar de nuevo? [S/N]\n");
 }
