@@ -472,6 +472,7 @@ void imprimir_terreno(juego_t* juego){
 // MOVIMIENTOS
 
 void personaje_activo(juego_t* juego, char* movimiento){
+
     if((*juego).personaje_activo == STITCH){
       (*juego).personaje_activo = REUBEN;
       imprimir_terreno(juego);
@@ -479,7 +480,26 @@ void personaje_activo(juego_t* juego, char* movimiento){
       (*juego).personaje_activo = STITCH;
       imprimir_terreno(juego);
     }
+
   }
+
+void tomar_ingrediente(juego_t* juego,char* movimiento){
+
+  for(int i = 0; i <= (*juego).tope_comida; i++){
+    for(int j = 0; j <= (*juego).comida[i].tope_ingredientes; j ++){
+ if((no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) == false) && ((*juego).stitch.objeto_en_mano == VACIO)){
+  if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).stitch.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).stitch.posicion.col)){
+  (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
+  (*juego).comida[i].ingrediente[j].posicion.fil = -1;
+  (*juego).comida[i].ingrediente[j].posicion.col = -1;
+  imprimir_terreno(juego);
+  printf("Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
+  }
+ }
+    }
+    }
+  
+}
 
 
 void chequear_pared(juego_t* juego, char* movimiento, int* cant_movimientos){
@@ -504,7 +524,9 @@ void chequear_pared(juego_t* juego, char* movimiento, int* cant_movimientos){
     imprimir_terreno(juego);
     printf("Stitch: Es extraño... es como si me estuvieras dando ordenes sin sentido...\n");
   }
-  } else if ((*juego).personaje_activo == REUBEN) {
+
+      } 
+  else if ((*juego).personaje_activo == REUBEN) {
 
     if((*movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col + 1))) {
     (*juego).reuben.posicion.col ++;
@@ -524,7 +546,7 @@ void chequear_pared(juego_t* juego, char* movimiento, int* cant_movimientos){
     imprimir_terreno(juego);
   } else{
     imprimir_terreno(juego);
-    printf("Reuben: Es extraño... es como si me estuvieras dando ordenes sin sentido...\n");
+    printf("Reuben: Es extraño... es como si recibiera ordenes sin sentido...\n");
   }
   }
  }
@@ -546,10 +568,7 @@ void chequear_obstaculo(juego_t* juego, char* movimiento, int* cant_movimientos)
   
  }
 
-/* void tomar_ingrediente(juego_t juego, movimiento){
- if(movimiento == TOMAR_ALIMENTO && (calcular_distancia((*juego).stitch.posicion.fil, (*juego).stitch.posicion.col,)))
- }
- */
+
 /*
 void chequear_herramienta(juego_t* juego, char* movimiento, int* cant_movimientos){
   if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && (*movimiento == CUCHILLO) && tener el ingrediente en la mano){
@@ -559,31 +578,28 @@ void chequear_herramienta(juego_t* juego, char* movimiento, int* cant_movimiento
 */
 
 
-void realizar_jugada(juego_t* juego, char* movimiento, int precio) {
+void realizar_jugada(juego_t* juego, char* movimiento) {
   int cant_movimientos = 0;
   (*juego).personaje_activo = STITCH;
+  (*juego).stitch.objeto_en_mano = VACIO;
 
   while(cant_movimientos < 25) {
   printf("¿Que movimiento desea hacer?\n");
   scanf(" %c", movimiento);
-  if(*movimiento == CAMBIAR_PERSONAJE){
-      personaje_activo(juego, movimiento);
-  } else {
+if(*movimiento == CAMBIAR_PERSONAJE){
+  personaje_activo(juego, movimiento);
+} else if (*movimiento == TOMAR_ALIMENTO){
+  tomar_ingrediente(juego, movimiento);
+} else {
   chequear_pared(juego, movimiento, &cant_movimientos);
   chequear_obstaculo(juego, movimiento, &cant_movimientos);
-//  tomar_ingrediente(juego, movimiento);
 //  chequear_herramienta(juego, movimiento);
+}
   }
-  }
+  
 
 
   printf("Desea jugar de nuevo? [S/N]\n");
-  scanf(" %c", movimiento);
-  if(*movimiento == 'S') {
-    inicializar_juego(juego, precio);
-    imprimir_terreno(juego);
-    realizar_jugada(juego, movimiento);
-  }
 }
 
 
