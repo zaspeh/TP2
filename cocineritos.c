@@ -16,7 +16,7 @@
 #define TOMAR_ALIMENTO 'R'
 #define CAMBIAR_PERSONAJE 'X'
 #define USAR_CUCHILLO 'C'
-#define COLOCAR_EN_MESA 'T'
+#define INTERACTUAR_CON_MESA 'T'
 
 const char VACIO = '.';
 const char PARED = '#';
@@ -266,6 +266,8 @@ void anadir_mesa_y_salida(juego_t* juego) {
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].tipo = LECHUGA;
+  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cortado = false;
+  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cocinado = false;
   (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
   }
   }
@@ -277,6 +279,8 @@ void anadir_mesa_y_salida(juego_t* juego) {
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
   (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].tipo = TOMATE;
+  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cortado = false;
+  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cocinado = false;
   (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
   }
   }
@@ -403,6 +407,11 @@ void incorporar_herramientas(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
   }
 }
 }
+void incorporar_mesa_y_salida(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
+   matriz[POSICION_FILA_MESA][POSICION_COLUMNA_MESA] = MESA;
+   matriz[(*juego).salida.fil][(*juego).salida.col] = SALIDA;
+
+}
 
 void incorporar_ingredientes(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
       for(int y = 0; y < juego->tope_comida; y++){
@@ -418,11 +427,7 @@ void incorporar_ingredientes(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
    }
 
 }
-void incorporar_mesa_y_salida(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
-   matriz[POSICION_FILA_MESA][POSICION_COLUMNA_MESA] = MESA;
-   matriz[(*juego).salida.fil][(*juego).salida.col] = SALIDA;
 
-}
 
 void incorporar_personajes(juego_t* juego, char matriz[MAX_FIL][MAX_COL]) {
   matriz[(*juego).stitch.posicion.fil][(*juego).stitch.posicion.col] = STITCH;
@@ -434,8 +439,8 @@ void incorporar_elementos_en_matriz(juego_t* juego, char matriz[MAX_FIL][MAX_COL
  incorporar_paredes(juego, matriz);
  incorporar_obstaculos(juego, matriz);
  incorporar_herramientas(juego, matriz);
- incorporar_ingredientes(juego, matriz);
  incorporar_mesa_y_salida(juego, matriz);
+ incorporar_ingredientes(juego, matriz);
  incorporar_personajes(juego, matriz);
 
 }
@@ -631,15 +636,15 @@ void usar_cuchillo(juego_t* juego){
  }
 }
 
-void colocar_en_mesa(juego_t* juego){
+void interactuar_con_mesa(juego_t* juego,char matriz[MAX_FIL][MAX_COL]){
   if((*juego).personaje_activo == STITCH){
   for(int i = 0; i < juego->tope_comida; i++){
   for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (juego->comida[i].ingrediente[j].esta_cortado) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1)){
+     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (juego->comida[i].ingrediente[j].esta_cortado == true) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && (matriz[POSICION_FILA_MESA][POSICION_COLUMNA_MESA] == MESA)){
 
-     juego->comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA;
-     juego->comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA;
-     juego->stitch.objeto_en_mano == VACIO;
+     juego->comida[i].ingrediente[j].posicion.fil = POSICION_FILA_MESA;
+     juego->comida[i].ingrediente[j].posicion.col = POSICION_COLUMNA_MESA;
+     juego->stitch.objeto_en_mano = VACIO;
      printf("Stitch: REUBEN!!! VENÌ A BUSCARLO!\n");
      }
       }
@@ -671,8 +676,8 @@ switch(*movimiento){
   case USAR_CUCHILLO:
   usar_cuchillo(juego);
   break;
-  case COLOCAR_EN_MESA:
-  
+  case INTERACTUAR_CON_MESA:
+  interactuar_con_mesa(juego, matriz);
   break;
 
 }
