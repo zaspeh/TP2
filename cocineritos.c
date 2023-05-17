@@ -176,6 +176,8 @@ bool condicion_ganadora(juego_t juego){
 // FIN VALIDACIONES
 
 
+
+
 // HERRAMIENTAS DE PROGRAMACION
 
 
@@ -198,6 +200,31 @@ void ingrediente_listo(juego_t* juego, int lugar_comida, int lugar_ingrediente){
   (*juego).comida[lugar_comida].tope_ingredientes --;
 }
 
+void anadir_ingrediente_particular(juego_t* juego, int tope_comida, int tope_ingrediente, char tipo, int fila, int col){
+ (*juego).comida[tope_comida].ingrediente[tope_ingrediente].posicion.fil = fila;
+ (*juego).comida[tope_comida].ingrediente[tope_ingrediente].posicion.col = col;
+ (*juego).comida[tope_comida].ingrediente[tope_ingrediente].tipo = tipo;
+ (*juego).comida[tope_comida].ingrediente[tope_ingrediente].esta_cortado = false;
+ (*juego).comida[tope_comida].ingrediente[tope_ingrediente].esta_cocinado = false;
+ (*juego).comida[tope_comida].tope_ingredientes ++;
+// ejemplo de uso : 
+//   anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
+}
+
+
+void anadir_obstaculo(juego_t* juego, int tope_obstaculo, char tipo, int fila, int col){
+  (*juego).obstaculos[tope_obstaculo].posicion.fil = fila;
+  (*juego).obstaculos[tope_obstaculo].posicion.col = col;
+  (*juego).obstaculos[tope_obstaculo].tipo = tipo;
+  (*juego).tope_obstaculos ++;
+}
+
+void anadir_herramienta(juego_t* juego, int tope_herramientas, char tipo, int fila, int col){
+    (*juego).herramientas[tope_herramientas].posicion.fil = fila;
+    (*juego).herramientas[tope_herramientas].posicion.col = col;
+    (*juego).herramientas[tope_herramientas].tipo = tipo;
+    (*juego).tope_herramientas ++;
+}
 
 
 // FIN HERRAMIENTAS DE PROGRAMACION
@@ -219,10 +246,7 @@ void anadir_obstaculos(juego_t* juego) {
   int numero_fila_random = rand() % 8 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if( puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).obstaculos[(*juego).tope_obstaculos].posicion.fil = numero_fila_random;
-  (*juego).obstaculos[(*juego).tope_obstaculos].posicion.col = numero_columna_random;
-  (*juego).obstaculos[(*juego).tope_obstaculos].tipo = AGUJERO;
-  (*juego).tope_obstaculos ++;
+  anadir_obstaculo(juego, (*juego).tope_obstaculos, AGUJERO, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -232,10 +256,7 @@ void anadir_obstaculos(juego_t* juego) {
   int numero_fila_random = rand() % 8 + 12; 
   int numero_columna_random = rand() % 19 + 1;
   if( puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).obstaculos[(*juego).tope_obstaculos].posicion.fil = numero_fila_random;
-  (*juego).obstaculos[(*juego).tope_obstaculos].posicion.col = numero_columna_random;
-  (*juego).obstaculos[(*juego).tope_obstaculos].tipo = AGUJERO;
-  (*juego).tope_obstaculos ++;
+  anadir_obstaculo(juego, (*juego).tope_obstaculos, AGUJERO, numero_fila_random, numero_columna_random);
   }
   }
 }
@@ -248,11 +269,7 @@ while((*juego).tope_herramientas < 2){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if( no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random)){
-    (*juego).herramientas[(*juego).tope_herramientas].posicion.fil = numero_fila_random;
-    (*juego).herramientas[(*juego).tope_herramientas].posicion.col = numero_columna_random;
-    (*juego).herramientas[(*juego).tope_herramientas].tipo = CUCHILLO;
-    (*juego).tope_herramientas ++;
-
+anadir_herramienta(juego, (*juego).tope_herramientas, CUCHILLO, numero_fila_random, numero_columna_random);
   }
 }
 }
@@ -263,11 +280,7 @@ while((*juego).tope_herramientas < 4){
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
   if( no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random)){
-    (*juego).herramientas[(*juego).tope_herramientas].posicion.fil = numero_fila_random;
-    (*juego).herramientas[(*juego).tope_herramientas].posicion.col = numero_columna_random;
-    (*juego).herramientas[(*juego).tope_herramientas].tipo = HORNO;
-    (*juego).tope_herramientas ++;
-
+anadir_herramienta(juego, (*juego).tope_herramientas, HORNO, numero_fila_random, numero_columna_random);
   }
 }
 }
@@ -306,12 +319,7 @@ void anadir_mesa_y_salida(juego_t* juego) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].tipo = LECHUGA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -319,12 +327,7 @@ void anadir_mesa_y_salida(juego_t* juego) {
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].tipo = TOMATE;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida->tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -340,12 +343,7 @@ void anadir_pizza(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = JAMON;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -353,12 +351,7 @@ void anadir_pizza(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = QUESO;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -366,12 +359,7 @@ void anadir_pizza(juego_t* juego){
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = MASA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, MASA, numero_fila_random, numero_columna_random);
   }
   }
   (*juego).comida[(*juego).tope_comida].tipo = PIZZA;
@@ -386,12 +374,7 @@ void anadir_hamburguesa(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = LECHUGA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -399,12 +382,7 @@ void anadir_hamburguesa(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = TOMATE;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -412,12 +390,7 @@ void anadir_hamburguesa(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = PAN;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -425,12 +398,7 @@ void anadir_hamburguesa(juego_t* juego){
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = MASA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, MASA, numero_fila_random, numero_columna_random);
   }
   }
   (*juego).comida[(*juego).tope_comida].tipo = HAMBURGUESA;
@@ -445,12 +413,7 @@ void anadir_sandwich(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = LECHUGA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -458,12 +421,7 @@ void anadir_sandwich(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = TOMATE;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -471,12 +429,7 @@ void anadir_sandwich(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = PAN;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -484,12 +437,7 @@ void anadir_sandwich(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = JAMON;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -497,25 +445,15 @@ void anadir_sandwich(juego_t* juego){
   int numero_fila_random = rand() % 9 + 1;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = QUESO;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, numero_fila_random, numero_columna_random);
   }
   }
 
-    while((*juego).comida[(*juego).tope_comida].tope_ingredientes < 6) {
+  while((*juego).comida[(*juego).tope_comida].tope_ingredientes < 6) {
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
   if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random)){
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.fil = numero_fila_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].posicion.col = numero_columna_random;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].tipo = MILANESA;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cortado = false;
-  (*juego).comida[(*juego).tope_comida].ingrediente[(*juego).comida[(*juego).tope_comida].tope_ingredientes].esta_cocinado = false;
-  (*juego).comida[(*juego).tope_comida].tope_ingredientes ++;
+  anadir_ingrediente_particular(juego, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, MILANESA, numero_fila_random, numero_columna_random);
   }
   }
 
@@ -544,7 +482,7 @@ void anadir_sandwich(juego_t* juego){
 
 } */
 
-void anadir_personajes(juego_t* juego) {
+void anadir_ambos_personajes(juego_t* juego) {
   int cantidad_personajes = 0;
 
   while(cantidad_personajes < 1){
@@ -589,7 +527,7 @@ void inicializar_juego(juego_t* juego) {
   anadir_hornos(juego);
   anadir_ensalada(juego);
   anadir_mesa_y_salida(juego);
-  anadir_personajes(juego);
+  anadir_ambos_personajes(juego);
 
 
 
