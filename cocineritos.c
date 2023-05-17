@@ -20,6 +20,7 @@
 #define USAR_HORNO 'H'
 
 const char VACIO = '.';
+const char MANO_VACIA = 'V';
 const char PARED = '#';
 const char MESA = '_';
 const char SALIDA = 'P';
@@ -46,6 +47,7 @@ const char HAMBURGUESA = 'H';
 const char SANDWICH = 'S';
 const char PUERTA_DE_SALIDA = 'P';
 const char MATAFUEGOS = 'M';
+const char FUEGO = 'F';
 
 const int OBSTACULOS_POR_CUADRANTE = 10;
 const int MITAD_DE_COLUMNAS = 10;
@@ -113,7 +115,7 @@ bool no_hay_pared(juego_t juego,int numero_fila_random, int numero_columna_rando
   bool libre = true;
 
   for(int i = 0; i < juego.tope_paredes; i++){
-    if(juego.paredes[i].fil == numero_fila_random && juego.paredes[i].col == numero_columna_random) {
+    if((juego.paredes[i].fil == numero_fila_random && juego.paredes[i].col == numero_columna_random) || ((juego).mesa.fil == numero_fila_random && (juego).mesa.col == numero_columna_random)) {
       libre = false;
     } 
   }
@@ -161,13 +163,21 @@ bool no_hay_puerta(juego_t juego, int fila, int columna){
   return libre;
 }
 
+bool no_hay_personaje(juego_t juego, int fila, int columna){
+    bool libre = true;
+  if(((juego.stitch.posicion.fil == fila) && (juego.stitch.posicion.col == columna)) || ((juego.reuben.posicion.fil == fila) && (juego.reuben.posicion.col == columna))){
+   libre = false;
+  }
+  return libre;
+}
+
 bool condicion_ganadora(juego_t juego){
   bool se_gano = false;
- if((juego.precio_total <= CATEGORIA_PRECIO_1) && (juego.tope_comida_lista == 5)){
+ if((juego.precio_total <= CATEGORIA_PRECIO_1) && (juego.tope_comida_lista == 0) && (juego.comida_actual == PIZZA)){
   se_gano = true;
- } else if((CATEGORIA_PRECIO_1 < juego.precio_total) && (juego.precio_total <= CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == 9)) {
+ } else if((CATEGORIA_PRECIO_1 < juego.precio_total) && (juego.precio_total <= CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == 0) && (juego.comida_actual == HAMBURGUESA)) {
   se_gano = true;
- } else if((juego.precio_total > CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == 15)){
+ } else if((juego.precio_total > CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == 0) && (juego.comida_actual == SANDWICH)){
   se_gano = true;
  }
 
@@ -262,6 +272,31 @@ void anadir_obstaculos(juego_t* juego) {
   }
 }
 
+void anadir_fuego_cuadrante_stitch(juego_t* juego){
+  int nuevo_tope = (*juego).tope_obstaculos ++;
+   while((*juego).tope_obstaculos < nuevo_tope) {
+  int numero_fila_random = rand() % 8 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  if(puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random) && no_hay_personaje(*juego, numero_fila_random, numero_columna_random) ){
+  anadir_obstaculo(juego, (*juego).tope_obstaculos, FUEGO, numero_fila_random, numero_columna_random);
+  }
+  }
+
+}
+
+
+void anadir_fuego_cuadrante_reuben(juego_t* juego){
+  int nuevo_tope = (*juego).tope_obstaculos ++;
+  while((*juego).tope_obstaculos < nuevo_tope) {
+  int numero_fila_random = rand() % 8 + 12;
+  int numero_columna_random = rand() % 19 + 1;
+  if(puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random) && no_hay_personaje(*juego, numero_fila_random, numero_columna_random) ){
+  anadir_obstaculo(juego, (*juego).tope_obstaculos, FUEGO, numero_fila_random, numero_columna_random);
+  }
+  }
+
+}
+
 void anadir_cuchillos(juego_t* juego) {
 
 (*juego).tope_herramientas = 0;
@@ -286,7 +321,19 @@ anadir_herramienta(juego, (*juego).tope_herramientas, HORNO, numero_fila_random,
 }
 }
 
-void anadir_matafuegos(juego_t* juego) {
+void anadir_matafuegos_cuadrante_stitch(juego_t* juego) {
+
+while((*juego).tope_herramientas < 5){
+  int numero_fila_random = rand() % 9 + 1;
+  int numero_columna_random = rand() % 19 + 1;
+  if(no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random)){
+anadir_herramienta(juego, (*juego).tope_herramientas, MATAFUEGOS, numero_fila_random, numero_columna_random);
+  }
+}
+
+}
+
+void anadir_matafuegos_cuadrante_reuben(juego_t* juego) {
 
 while((*juego).tope_herramientas < 5){
   int numero_fila_random = rand() % 8 + 12;
@@ -347,6 +394,7 @@ void anadir_mesa_y_salida(juego_t* juego) {
  (*juego).comida[(*juego).tope_comida].tipo = ENSALADA;
  (*juego).comida_actual = ENSALADA;
  (*juego).tope_comida++;
+ (*juego).tope_comida_lista = 2;
 
 }
 
@@ -380,6 +428,7 @@ void anadir_pizza(juego_t* juego){
   (*juego).comida[(*juego).tope_comida].tipo = PIZZA;
   (*juego).comida_actual = PIZZA;
   (*juego).tope_comida ++;
+  (*juego).tope_comida_lista = 3;
 }
 
 void anadir_hamburguesa(juego_t* juego){
@@ -420,6 +469,7 @@ void anadir_hamburguesa(juego_t* juego){
   (*juego).comida[(*juego).tope_comida].tipo = HAMBURGUESA;
   (*juego).comida_actual = HAMBURGUESA;
   (*juego).tope_comida ++;
+  (*juego).tope_comida_lista = 4;
 }
 
 void anadir_sandwich(juego_t* juego){
@@ -477,6 +527,7 @@ void anadir_sandwich(juego_t* juego){
   (*juego).comida[(*juego).tope_comida].tipo = SANDWICH;
   (*juego).comida_actual = SANDWICH;
   (*juego).tope_comida ++;
+  (*juego).tope_comida_lista = 6;
 }
 
 
@@ -535,8 +586,8 @@ void inicializar_juego(juego_t* juego, int precio) {
  (*juego).tope_comida_lista = 0;
  (*juego).tope_comida = 0;
  (*juego).personaje_activo = STITCH;
- (*juego).stitch.objeto_en_mano = ' ';
- (*juego).reuben.objeto_en_mano = ' ';
+ (*juego).stitch.objeto_en_mano = MANO_VACIA;
+ (*juego).reuben.objeto_en_mano = MANO_VACIA;
  (*juego).precio_total = precio;
 
  srand (( unsigned)time(NULL));
@@ -702,16 +753,16 @@ void chequear_pared(juego_t* juego, char movimiento){
   } 
       } 
   else if ((*juego).personaje_activo == REUBEN) {
-    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1)))) {
+    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) {
     (*juego).reuben.posicion.col ++;
     (*juego).movimientos ++;
-  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1)))){
+  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))){
     (*juego).reuben.posicion.col --;
     (*juego).movimientos ++;
-  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col))){
+  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)){
     (*juego).reuben.posicion.fil ++;
     (*juego).movimientos ++;
-  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col))) {
+  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) {
     (*juego).reuben.posicion.fil --;
     (*juego).movimientos ++;
   }
@@ -732,15 +783,14 @@ void chequear_puerta(juego_t* juego){
       if(((*juego).reuben.objeto_en_mano == MASA || (*juego).reuben.objeto_en_mano == CARNE || (*juego).reuben.objeto_en_mano == MILANESA) && (*juego).comida[i].ingrediente[j].esta_cocinado){
         printf("Reuben: Magicamente se emplato el ingrediente del tipo %c!\n", (*juego).reuben.objeto_en_mano);
     //    ingrediente_listo(juego, i, j);
-        (*juego).tope_comida_lista ++;
-        (*juego).reuben.objeto_en_mano = VACIO;
+        (*juego).tope_comida_lista --;
+        (*juego).reuben.objeto_en_mano = MANO_VACIA;
         
-        (*juego).reuben.objeto_en_mano = VACIO;
       } else if ((*juego).comida[i].ingrediente[j].esta_cortado){
         printf("Reuben: Magicamente se emplato el ingrediente del tipo %c!\n", (*juego).reuben.objeto_en_mano);
   //      ingrediente_listo(juego, i, j);
-        (*juego).tope_comida_lista ++;
-        (*juego).reuben.objeto_en_mano = VACIO;
+        (*juego).tope_comida_lista --;
+        (*juego).reuben.objeto_en_mano = MANO_VACIA;
       }
     
     }
@@ -754,25 +804,25 @@ void chequear_puerta(juego_t* juego){
 void chequear_comidas(juego_t* juego){
  if((*juego).precio_total <= CATEGORIA_PRECIO_1){
 
- if(((*juego).tope_comida_lista == 2) && ((*juego).tope_comida < 2)) {
+ if(((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == ENSALADA)) {
   anadir_pizza(juego);
  }
 
  } else if((CATEGORIA_PRECIO_1 < (*juego).precio_total) && ((*juego).precio_total <= CATEGORIA_PRECIO_2)) {
 
-if(((*juego).tope_comida_lista == 2) && ((*juego).tope_comida < 2)) {
+if(((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == ENSALADA)) {
 anadir_pizza(juego);
-} else if (((*juego).tope_comida_lista == 5) && ((*juego).tope_comida < 3)){
+} else if (((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == PIZZA)){
 anadir_hamburguesa(juego);
 }
 
  } else if((*juego).precio_total > CATEGORIA_PRECIO_2){
 
-if(((*juego).tope_comida_lista == 2) && ((*juego).tope_comida < 2)) {
+if(((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == ENSALADA)) {
 anadir_pizza(juego);
-} else if (((*juego).tope_comida_lista == 5) && ((*juego).tope_comida < 3)){
+} else if (((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == PIZZA)){
 anadir_hamburguesa(juego);
-} else if(((*juego).tope_comida_lista == 9) && ((*juego).tope_comida < 4)){
+} else if(((*juego).tope_comida_lista == 0) && ((*juego).comida_actual == HAMBURGUESA)){
 anadir_sandwich(juego);
 }
  }
@@ -803,7 +853,7 @@ void tomar_ingrediente(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
   for(int i = 0; i < (*juego).tope_comida; i++){
   for(int j = 0; j < (*juego).comida[i].tope_ingredientes; j ++){
- if(!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano == VACIO)){
+ if(!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA)){
 
   if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).stitch.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).stitch.posicion.col)){
   (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
@@ -812,16 +862,16 @@ void tomar_ingrediente(juego_t* juego){
 
   printf("Stitch: Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
   } 
-  } else if(!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != VACIO)){
+  } else if(!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA)){
   j = (*juego).comida[i].tope_ingredientes;
   i = (*juego).tope_comida;
 
   printf("Stitch: Cuantas cosas queres que tenga en la mano?\n");
   
- } else if(no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).stitch.objeto_en_mano)){
+ } else if(no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).stitch.objeto_en_mano)){
   (*juego).comida[i].ingrediente[j].posicion.fil = (*juego).stitch.posicion.fil;
   (*juego).comida[i].ingrediente[j].posicion.col = (*juego).stitch.posicion.col;
-  (*juego).stitch.objeto_en_mano = VACIO;
+  (*juego).stitch.objeto_en_mano = MANO_VACIA;
  
  }
      }
@@ -831,7 +881,7 @@ void tomar_ingrediente(juego_t* juego){
 } else if((*juego).personaje_activo == REUBEN){
   for(int i = 0; i < (*juego).tope_comida; i++){
   for(int j = 0; j < (*juego).comida[i].tope_ingredientes; j ++){
- if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano == VACIO)){
+ if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
 
   if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).reuben.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).reuben.posicion.col)){
   (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
@@ -841,16 +891,16 @@ void tomar_ingrediente(juego_t* juego){
   printf("Reuben: Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
   } 
 
- } else if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano != VACIO)){
+ } else if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
   j = (*juego).comida[i].tope_ingredientes;
   i = (*juego).tope_comida;
 
   printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
 
- } else if(no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).reuben.objeto_en_mano)){
+ } else if(no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).reuben.objeto_en_mano)){
   (*juego).comida[i].ingrediente[j].posicion.fil = (*juego).reuben.posicion.fil;
   (*juego).comida[i].ingrediente[j].posicion.col = (*juego).reuben.posicion.col;
-  (*juego).reuben.objeto_en_mano = VACIO;
+  (*juego).reuben.objeto_en_mano = MANO_VACIA;
  
  }
   }
@@ -862,7 +912,7 @@ void tomar_ingrediente(juego_t* juego){
 
 void usar_cuchillo(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
-  if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != VACIO)){ // despues validar matafuegos
+  if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA)){ // despues validar matafuegos
 
   for(int i = 0; i < juego->tope_herramientas; i++){
    if((*juego).herramientas[i].posicion.fil == (*juego).stitch.posicion.fil && (*juego).herramientas[i].posicion.col == (*juego).stitch.posicion.col){
@@ -873,7 +923,7 @@ void usar_cuchillo(juego_t* juego){
     juego->comida[x].ingrediente[y].esta_cortado = true;
     printf("Stitch: Jeje cortao bacalo\n");
    } 
-   else if (((juego->comida[x].ingrediente[y].tipo == (*juego).stitch.objeto_en_mano) && (juego->comida[x].ingrediente[y].esta_cortado == false)) || juego->stitch.objeto_en_mano == VACIO){
+   else if (((juego->comida[x].ingrediente[y].tipo == (*juego).stitch.objeto_en_mano) && (juego->comida[x].ingrediente[y].esta_cortado == false)) || juego->stitch.objeto_en_mano == MANO_VACIA){
     printf("Stitch: Es como si estuviera recibiendo ordenes sin sentido...\n");
     i = juego->tope_herramientas;
 
@@ -894,9 +944,9 @@ void interactuar_con_mesa(juego_t* juego){
   for(int i = 0; i < juego->tope_comida; i++){
   for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
      if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (juego->comida[i].ingrediente[j].esta_cortado == true) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && no_hay_ingredientes(*juego, POSICION_FILA_MESA, POSICION_COLUMNA_MESA)){
-     juego->comida[i].ingrediente[j].posicion.fil = POSICION_FILA_MESA;
-     juego->comida[i].ingrediente[j].posicion.col = POSICION_COLUMNA_MESA;
-     juego->stitch.objeto_en_mano = VACIO;
+     juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
+     juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
+     juego->stitch.objeto_en_mano = MANO_VACIA;
      printf("Stitch: REUBEN!!! VENÌ A BUSCARLO!\n");
      }
       }
@@ -904,13 +954,13 @@ void interactuar_con_mesa(juego_t* juego){
   } else if((*juego).personaje_activo == REUBEN){
   for(int i = 0; i < juego->tope_comida; i++){
   for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == VACIO)){
+  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
     (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
     (*juego).comida[i].ingrediente[j].posicion.fil = -1;
     (*juego).comida[i].ingrediente[j].posicion.col = -1;
 
   } 
-  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == VACIO) && ((*juego).reuben.objeto_en_mano != VACIO)){
+  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == MANO_VACIA) && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
     printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
     
     i = juego->tope_comida;
@@ -962,7 +1012,6 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   chequear_pared(juego, movimiento);
   chequear_puerta(juego);
   chequear_comidas(juego);
-if((*juego).movimientos < 15){
   switch(movimiento){
   case CAMBIAR_PERSONAJE: 
   personaje_activo(juego);
@@ -980,9 +1029,17 @@ if((*juego).movimientos < 15){
   interactuar_con_horno(juego);
   break;
   } 
-   } else if((*juego).movimientos == 15){
-  anadir_matafuegos(juego);
-   } 
+  if((*juego).movimientos == 15){
+    if((*juego).personaje_activo == STITCH){
+   anadir_matafuegos_cuadrante_stitch(juego);
+   anadir_fuego_cuadrante_stitch(juego);
+   (*juego).movimientos = 0;
+    } else if ((*juego).personaje_activo == REUBEN){
+    anadir_matafuegos_cuadrante_reuben(juego);
+    anadir_fuego_cuadrante_reuben(juego);
+    (*juego).movimientos = 0;
+    }
+  } 
   
 
   imprimir_terreno(*juego);
