@@ -554,7 +554,7 @@ void personaje_activo(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
 
   }
 
-void tomar_ingrediente(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
+void tomar_ingrediente(juego_t* juego){
 
 
   if((*juego).personaje_activo == STITCH){
@@ -566,12 +566,13 @@ void tomar_ingrediente(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
   (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
   (*juego).comida[i].ingrediente[j].posicion.fil = -1;
   (*juego).comida[i].ingrediente[j].posicion.col = -1;
-  imprimir_terreno(juego, matriz);
+
   printf("Stitch: Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
   } 
   } else if(!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != VACIO)){
   j = (*juego).comida[i].tope_ingredientes;
-  imprimir_terreno(juego, matriz);
+  i = (*juego).tope_comida;
+
   printf("Stitch: Cuantas cosas queres que tenga en la mano?\n");
   
  } else if(no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).stitch.objeto_en_mano)){
@@ -581,30 +582,38 @@ void tomar_ingrediente(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
  
  }
      }
-     } 
+     }
+
+
 } else if((*juego).personaje_activo == REUBEN){
   for(int i = 0; i <= (*juego).tope_comida; i++){
   for(int j = 0; j <= (*juego).comida[i].tope_ingredientes; j ++){
- if((no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) == false) && ((*juego).reuben.objeto_en_mano == VACIO)){
-  for(int i = 0; i <= (*juego).tope_comida; i++){
-  for(int j = 0; j <= (*juego).comida[i].tope_ingredientes; j ++){
+ if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano == VACIO)){
+
   if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).reuben.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).reuben.posicion.col)){
   (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
   (*juego).comida[i].ingrediente[j].posicion.fil = -1;
   (*juego).comida[i].ingrediente[j].posicion.col = -1;
-  imprimir_terreno(juego, matriz);
-  printf("Reuben: Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
-  }
-  }
-  }
- } else if((no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) == false) && ((*juego).reuben.objeto_en_mano != VACIO)){
+
+  printf("Stitch: Ohh mis manos recibieron un ingrediente del tipo %c!\n", (*juego).comida[i].ingrediente[j].tipo);
+  } 
+
+ } else if(!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano != VACIO)){
   j = (*juego).comida[i].tope_ingredientes;
-  imprimir_terreno(juego, matriz);
+  i = (*juego).tope_comida;
+
   printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
+
+ } else if(no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).reuben.objeto_en_mano)){
+  (*juego).comida[i].ingrediente[j].posicion.fil = (*juego).reuben.posicion.fil;
+  (*juego).comida[i].ingrediente[j].posicion.col = (*juego).reuben.posicion.col;
+  (*juego).reuben.objeto_en_mano = VACIO;
+ 
  }
   }
   }
-  }
+}
+
 }
 
 
@@ -632,6 +641,8 @@ void usar_cuchillo(juego_t* juego){
   } 
           }   
   } 
+ } else if ((*juego).personaje_activo == REUBEN){
+  printf("Reuben: Es extraño.. tengo unas locas ganas de cortar algo aunque no conozco esta funcion...\n");
  }
 }
 
@@ -648,6 +659,20 @@ void interactuar_con_mesa(juego_t* juego,char matriz[MAX_FIL][MAX_COL]){
      }
       }
       }
+  } else if((*juego).personaje_activo == REUBEN){
+  for(int i = 0; i < juego->tope_comida; i++){
+  for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
+  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == VACIO)){
+    (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
+    (*juego).comida[i].ingrediente[j].posicion.fil = -1;
+    (*juego).comida[i].ingrediente[j].posicion.col = -1;
+
+  } 
+  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && (matriz[POSICION_FILA_MESA][POSICION_COLUMNA_MESA] != MESA) && ((*juego).reuben.objeto_en_mano != VACIO)){
+    printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
+  }
+   }
+   }
   }
 
 
@@ -658,6 +683,7 @@ void realizar_jugada(juego_t* juego, char* movimiento, char matriz[MAX_FIL][MAX_
   int cant_movimientos = 0;
   (*juego).personaje_activo = STITCH;
   (*juego).stitch.objeto_en_mano = VACIO;
+  (*juego).reuben.objeto_en_mano = VACIO;
 
   while(cant_movimientos < 25) {
   printf("¿Que movimiento desea hacer?\n");
@@ -670,7 +696,7 @@ switch(*movimiento){
   personaje_activo(juego, matriz);
   break;
   case TOMAR_ALIMENTO:
-  tomar_ingrediente(juego, matriz);
+  tomar_ingrediente(juego);
   break;
   case USAR_CUCHILLO:
   usar_cuchillo(juego);
