@@ -183,6 +183,16 @@ bool no_hay_herramienta(juego_t juego, int numero_fila_random, int numero_column
   return libre;
 }
 
+bool no_hay_horno(juego_t juego, int numero_fila_random, int numero_columna_random) {
+  bool libre = true;
+  for(int i = 0; i < juego.tope_herramientas; i++){
+    if((juego.herramientas[i].posicion.fil == numero_fila_random) && (juego.herramientas[i].posicion.col == numero_columna_random) && (juego.herramientas[i].tipo == HORNO)) {
+      libre = false;
+    } 
+  }
+  return libre;
+}
+
 bool no_hay_ingredientes(juego_t juego, int numero_fila_random, int numero_columna_random){
   bool libre = true;
   for(int j = 0; j < juego.tope_comida; j++){
@@ -836,22 +846,22 @@ void chequear_movimiento(juego_t* juego, char movimiento){
   } 
       } 
   else if ((*juego).personaje_activo == REUBEN) {
-    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col + 1))) {
+    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_horno(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col + 1))) {
     (*juego).reuben.posicion.col ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col - 1))){
+  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_horno(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col - 1))){
     (*juego).reuben.posicion.col --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil + 1,(*juego).reuben.posicion.col))){
+  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_horno(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil + 1,(*juego).reuben.posicion.col))){
     (*juego).reuben.posicion.fil ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil - 1,(*juego).reuben.posicion.col))) {
+  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_horno(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil - 1,(*juego).reuben.posicion.col))) {
     (*juego).reuben.posicion.fil --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
@@ -861,7 +871,7 @@ void chequear_movimiento(juego_t* juego, char movimiento){
  }
 
 
-
+// Pos: Valida si reuben pasa por encima del apuerta y si reuben tiene un objeto cocinado o cortado en la mano, lo entrega.
 
 void chequear_puerta(juego_t* juego){
 
@@ -889,42 +899,44 @@ void chequear_puerta(juego_t* juego){
   }
 }
 
+// Pos: Cuando se termina de entregar un plato de comida añade el siguiento acorde al precio de juego_t y su comida actual.
 
 void chequear_comidas(juego_t* juego){
 
- if((*juego).precio_total <= CATEGORIA_PRECIO_1){
+ if(((*juego).precio_total <= CATEGORIA_PRECIO_1) && ((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes)){
 
- if(((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == ENSALADA)) {
+ if((*juego).comida_actual == ENSALADA) {
  (*juego).tope_comida_lista = 0;
  anadir_pizza(juego);
  }
 
+ } else if((CATEGORIA_PRECIO_1 < (*juego).precio_total) && ((*juego).precio_total <= CATEGORIA_PRECIO_2) && (*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) {
 
- } else if((CATEGORIA_PRECIO_1 < (*juego).precio_total) && ((*juego).precio_total <= CATEGORIA_PRECIO_2)) {
+ if((*juego).comida_actual == ENSALADA) {
+ (*juego).tope_comida_lista = 0;
+ anadir_pizza(juego);
+ } else if ((*juego).comida_actual == PIZZA){
+ (*juego).tope_comida_lista = 0;
+ anadir_hamburguesa(juego);
+ }
 
-if(((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == ENSALADA)) {
-(*juego).tope_comida_lista = 0;
-anadir_pizza(juego);
-} else if (((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == PIZZA)){
-(*juego).tope_comida_lista = 0;
-anadir_hamburguesa(juego);
-}
+ } else if(((*juego).precio_total > CATEGORIA_PRECIO_2) && ((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes)){
 
-
- } else if((*juego).precio_total > CATEGORIA_PRECIO_2){
-
-if(((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == ENSALADA)) {
-(*juego).tope_comida_lista = 0;
-anadir_pizza(juego);
-} else if (((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == PIZZA)){
-(*juego).tope_comida_lista = 0;
-anadir_hamburguesa(juego);
-} else if(((*juego).tope_comida_lista == (*juego).comida[(*juego).tope_comida -1].tope_ingredientes) && ((*juego).comida_actual == HAMBURGUESA)){
-(*juego).tope_comida_lista = 0;
-anadir_sandwich(juego);
-}
+ if((*juego).comida_actual == ENSALADA) {
+ (*juego).tope_comida_lista = 0;
+ anadir_pizza(juego);
+  } else if ((*juego).comida_actual == PIZZA){
+  (*juego).tope_comida_lista = 0;
+ anadir_hamburguesa(juego);
+  } else if ((*juego).comida_actual == HAMBURGUESA){
+ (*juego).tope_comida_lista = 0;
+ anadir_sandwich(juego);
+  }  
+  
  }
 }
+
+// Pos: Si el personaje activo se encuentra por encima de un matafuego con sus manos vacias, entonces el personaje toma el matafuegos
 
 void chequear_matafuegos(juego_t* juego) {
   if((*juego).personaje_activo == STITCH){
@@ -957,6 +969,23 @@ void chequear_matafuegos(juego_t* juego) {
   }
     }
 
+// Pos: Se fija cuando hacer aparecer un fuego.
+
+void chequear_aparecer_un_fuego(juego_t* juego){
+  if((*juego).movimientos == MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO){
+  chequear_matafuegos(juego);
+    if((*juego).personaje_activo == STITCH){
+   anadir_matafuegos_cuadrante_stitch(juego);
+   anadir_fuego_cuadrante_stitch(juego);
+
+    } else if ((*juego).personaje_activo == REUBEN){
+    anadir_matafuegos_cuadrante_reuben(juego);
+    anadir_fuego_cuadrante_reuben(juego);
+
+    }
+  } 
+}
+
 // FIN CHEQUEOS
 
 
@@ -968,6 +997,8 @@ void chequear_matafuegos(juego_t* juego) {
   
  
 
+// Pos: Cambia de personaje
+
 void personaje_activo(juego_t* juego){
 
     if((*juego).personaje_activo == STITCH){
@@ -977,6 +1008,8 @@ void personaje_activo(juego_t* juego){
     }
 
   }
+
+// Pos: Dependiendo de si el personaje activo este arriba de un ingrediente y tiene sus manos vacias, podra tomarlo, a su vez si tiene algo en la mano no podra, y por ultimo si quiere soltar el ingrediente puede hacerlo si no hay nada en su posicion.
 
 void tomar_ingrediente(juego_t* juego){
 
@@ -1040,6 +1073,7 @@ void tomar_ingrediente(juego_t* juego){
 
 }
 
+// Pos: Permite a stitch cortar los ingredientes.
 
 void usar_cuchillo(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
@@ -1069,6 +1103,8 @@ void usar_cuchillo(juego_t* juego){
   printf("Reuben: Es extraño.. tengo unas locas ganas de cortar algo aunque no conozco esa funcion...\n");
  }
 }
+
+// Pos: permite al personaje_activo apagar un fuego cuando use el matafuegos a distancia manhattan <= 2 del mismo (con el matafuegos en la mano).
 
 void usar_matafuegos(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
@@ -1102,47 +1138,68 @@ i++;
  }
 }
 
+//Pos: Permite a los personajes poner y dejar ingredientes en la mesa
+
 void interactuar_con_mesa(juego_t* juego){
-  if((*juego).personaje_activo == STITCH){
-  for(int i = 0; i < juego->tope_comida; i++){
-  for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
+
+
+
+  if(((*juego).personaje_activo == STITCH) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1)){
+ 
+  int i = 0;
+  int j = 0;
+ 
+  while(i < juego->tope_comida){
+  while(j < juego->comida[i].tope_ingredientes){
+
+     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
      juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
      juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
      juego->stitch.objeto_en_mano = MANO_VACIA;
      printf("Stitch: REUBEN!!! VENÌ A BUSCARLO!\n");
-     }  else if((calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA)){
+     }  else if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA)){
     (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
     (*juego).comida[i].ingrediente[j].posicion.fil = -1;
     (*juego).comida[i].ingrediente[j].posicion.col = -1;
 
-  }  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
-    printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
+  }  else if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).stitch.objeto_en_mano != MANO_VACIA)){
+    printf("Stitch: Cuantas cosas queres que tenga en la mano?\n");
     i = juego->tope_comida;
     j = juego->comida[i].tope_ingredientes;
   }
+  i++;
+  j++;
+
       }
       }
-  } else if((*juego).personaje_activo == REUBEN){
-  for(int i = 0; i < juego->tope_comida; i++){
-  for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
+  
+  } else if(((*juego).personaje_activo == REUBEN) && (calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1)){
+ 
+  int i = 0;
+  int j = 0;
+
+  while(i < juego->tope_comida){
+  while(j < juego->comida[i].tope_ingredientes){
+
+  if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
     (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
     (*juego).comida[i].ingrediente[j].posicion.fil = -1;
     (*juego).comida[i].ingrediente[j].posicion.col = -1;
 
-  } else if((juego->comida[i].ingrediente[j].tipo == juego->reuben.objeto_en_mano) && (calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
+  } else if((juego->comida[i].ingrediente[j].tipo == juego->reuben.objeto_en_mano) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
      juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
      juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
      juego->reuben.objeto_en_mano = MANO_VACIA;
      printf("reuben: REUBEN!!! VENÌ A BUSCARLO!\n");
      }
 
-  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
+  else if(((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
     printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
     i = juego->tope_comida;
     j = juego->comida[i].tope_ingredientes;
   }
+  i++;
+  j++;
    }
    }
   }
@@ -1150,6 +1207,7 @@ void interactuar_con_mesa(juego_t* juego){
 
 }
 
+// Pos: Permite a Reuben usar el horno
 
 void interactuar_con_horno(juego_t* juego){
 
@@ -1183,9 +1241,12 @@ void interactuar_con_horno(juego_t* juego){
 
 
 
-
+// Pre: Debe recibir un movimiento con una letra ya asignada
+// Pos: Segun el movimiento analiza lo que hacen los personajes_activos de juego_t y hace funcionar al juego.
 
 void realizar_jugada(juego_t* juego, char movimiento) {
+
+
   chequear_movimiento(juego, movimiento);
   chequear_puerta(juego);
   chequear_comidas(juego);
@@ -1214,24 +1275,12 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   break;
 
   } 
-  if((*juego).movimientos == MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO){
-  chequear_matafuegos(juego);
-    if((*juego).personaje_activo == STITCH){
-   anadir_matafuegos_cuadrante_stitch(juego);
-   anadir_fuego_cuadrante_stitch(juego);
 
-    } else if ((*juego).personaje_activo == REUBEN){
-    anadir_matafuegos_cuadrante_reuben(juego);
-    anadir_fuego_cuadrante_reuben(juego);
-
-    }
-  } 
-  
-
+  chequear_aparecer_un_fuego(juego);
   imprimir_terreno(*juego);
-
-
 }
+
+// Pos: Se fija cuando el juego se gana o pierde
 
 int estado_juego(juego_t juego){
   int resultado = SIGUE_JUGANDO;
