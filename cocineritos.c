@@ -149,6 +149,14 @@ bool no_hay_fuego(juego_t juego, int numero_fila_random, int numero_columna_rand
   return libre;
 }
 
+bool hay_fuego_en_alguna_parte(juego_t juego){
+  bool libre = false;
+    if(juego.tope_obstaculos == 21) {
+      libre = true;
+    } 
+  return libre;
+}
+
 bool no_hay_herramienta(juego_t juego, int numero_fila_random, int numero_columna_random) {
   bool libre = true;
   for(int i = 0; i < juego.tope_herramientas; i++){
@@ -1140,13 +1148,17 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   tomar_ingrediente(juego);
   break;
   case USAR_CUCHILLO:
+  if(!hay_fuego_en_alguna_parte(*juego)){
   usar_cuchillo(juego);
+  }
   break;
   case USAR_MATAFUEGOS:
   usar_matafuegos(juego);
   break;
   case INTERACTUAR_CON_MESA:
+  if(!hay_fuego_en_alguna_parte(*juego)){
   interactuar_con_mesa(juego);
+  }
   break;
   case USAR_HORNO:
   interactuar_con_horno(juego);
