@@ -734,7 +734,12 @@ void imprimir_terreno(juego_t juego){
 
 
 
+
+
 // CHEQUEOS
+
+
+
 
 void chequear_pared(juego_t* juego, char movimiento){
   if((*juego).personaje_activo == STITCH){
@@ -835,6 +840,8 @@ anadir_sandwich(juego);
 }
 
 // FIN CHEQUEOS
+
+
 
 
 
@@ -960,13 +967,13 @@ void interactuar_con_mesa(juego_t* juego){
   } else if((*juego).personaje_activo == REUBEN){
   for(int i = 0; i < juego->tope_comida; i++){
   for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
+  if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA)){
     (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
     (*juego).comida[i].ingrediente[j].posicion.fil = -1;
     (*juego).comida[i].ingrediente[j].posicion.col = -1;
 
   } 
-  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == POSICION_FILA_MESA) && ((*juego).comida[i].ingrediente[j].posicion.col == POSICION_COLUMNA_MESA) && ((*juego).reuben.objeto_en_mano == MANO_VACIA) && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
+  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
     printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
     
     i = juego->tope_comida;
