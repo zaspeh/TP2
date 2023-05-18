@@ -177,7 +177,7 @@ bool condicion_ganadora(juego_t juego){
   bool se_gano = false;
  if((juego.precio_total <= CATEGORIA_PRECIO_1) && (juego.tope_comida_lista == juego.comida[juego.tope_comida -1].tope_ingredientes) && (juego.comida_actual == PIZZA)){
   se_gano = true;
- } else if((CATEGORIA_PRECIO_1 < juego.precio_total) && (juego.precio_total <= CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == juego.comida[juego.tope_comida -1].tope_ingredientes) && (juego.comida_actual == HAMBURGUESA)) {
+ } else if((juego.precio_total > CATEGORIA_PRECIO_1) && (juego.precio_total <= CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == juego.comida[juego.tope_comida -1].tope_ingredientes) && (juego.comida_actual == HAMBURGUESA)) {
   se_gano = true;
  } else if((juego.precio_total > CATEGORIA_PRECIO_2) && (juego.tope_comida_lista == juego.comida[juego.tope_comida -1].tope_ingredientes) && (juego.comida_actual == SANDWICH)){
   se_gano = true;
@@ -666,7 +666,7 @@ void incorporar_herramientas(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
 }
 }
 void incorporar_mesa_y_salida(juego_t* juego, char matriz[MAX_FIL][MAX_COL]){
-   matriz[POSICION_FILA_MESA][POSICION_COLUMNA_MESA] = MESA;
+   matriz[(*juego).mesa.fil][(*juego).mesa.col] = MESA;
    matriz[(*juego).salida.fil][(*juego).salida.col] = SALIDA;
 
 }
@@ -786,13 +786,13 @@ void chequear_puerta(juego_t* juego){
   
     if((*juego).comida[i].ingrediente[j].tipo == (*juego).reuben.objeto_en_mano){
       if((*juego).comida[i].ingrediente[j].esta_cortado || (*juego).comida[i].ingrediente[j].esta_cocinado){
-        printf("Reuben: Magicamente se emplato el ingrediente del tipo %c!\n", (*juego).reuben.objeto_en_mano);
     //    ingrediente_listo(juego, i, j);
     (*juego).comida_lista[(*juego).tope_comida_lista].tipo = (*juego).reuben.objeto_en_mano;
     (*juego).comida_lista[(*juego).tope_comida_lista].esta_cocinado = (*juego).comida[i].ingrediente[j].esta_cocinado;
     (*juego).comida_lista[(*juego).tope_comida_lista].esta_cortado = (*juego).comida[i].ingrediente[j].esta_cortado;
     (*juego).tope_comida_lista ++;
     (*juego).reuben.objeto_en_mano = MANO_VACIA;
+    printf("Reuben: Magicamente se emplato el ingrediente del tipo %c!\n", (*juego).reuben.objeto_en_mano);
         
     } 
   }
@@ -956,12 +956,21 @@ void interactuar_con_mesa(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
   for(int i = 0; i < juego->tope_comida; i++){
   for(int j = 0; j < juego->comida[i].tope_ingredientes; j++){
-     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (juego->comida[i].ingrediente[j].esta_cortado == true) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, POSICION_FILA_MESA, POSICION_COLUMNA_MESA) <= 1) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
+     if((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
      juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
      juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
      juego->stitch.objeto_en_mano = MANO_VACIA;
      printf("Stitch: REUBEN!!! VENÌ A BUSCARLO!\n");
-     }
+     }  else if((calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil , (*juego).mesa.col ) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA)){
+    (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
+    (*juego).comida[i].ingrediente[j].posicion.fil = -1;
+    (*juego).comida[i].ingrediente[j].posicion.col = -1;
+
+  }  else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
+    printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
+    i = juego->tope_comida;
+    j = juego->comida[i].tope_ingredientes;
+  }
       }
       }
   } else if((*juego).personaje_activo == REUBEN){
@@ -972,10 +981,15 @@ void interactuar_con_mesa(juego_t* juego){
     (*juego).comida[i].ingrediente[j].posicion.fil = -1;
     (*juego).comida[i].ingrediente[j].posicion.col = -1;
 
-  } 
+  } else if((juego->comida[i].ingrediente[j].tipo == juego->reuben.objeto_en_mano) && (calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col)){
+     juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
+     juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
+     juego->reuben.objeto_en_mano = MANO_VACIA;
+     printf("reuben: REUBEN!!! VENÌ A BUSCARLO!\n");
+     }
+
   else if((calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1) && ((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col)  && ((*juego).reuben.objeto_en_mano != MANO_VACIA)){
     printf("Reuben: Cuantas cosas queres que tenga en la mano?\n");
-    
     i = juego->tope_comida;
     j = juego->comida[i].tope_ingredientes;
   }
@@ -1063,10 +1077,8 @@ void realizar_jugada(juego_t* juego, char movimiento) {
 int estado_juego(juego_t juego){
   int resultado = SIGUE_JUGANDO;
   if(!no_hay_obstaculo(juego, juego.stitch.posicion.fil, juego.stitch.posicion.col) || !no_hay_obstaculo(juego, juego.reuben.posicion.fil, juego.reuben.posicion.col)){
-  printf("COMO NO LO VISTE?!?!? CAÌSTE EN UN AGUJERO. PERDISTE :( \n");
     resultado = PERDIO;
   } else if(condicion_ganadora(juego)){
-    printf("FELICITACIONES CAMPEON!! SACASTE TODAS LAS COMIDAS!!! (aunque te olvidaste a stitch y reuben pero bueno)\n");
     resultado = GANO;
   }
 
