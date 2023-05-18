@@ -18,6 +18,7 @@
 #define USAR_CUCHILLO 'C'
 #define INTERACTUAR_CON_MESA 'T'
 #define USAR_HORNO 'H'
+#define USAR_MATAFUEGOS 'M'
 
 const char VACIO = '.';
 const char MANO_VACIA = 'V';
@@ -49,6 +50,7 @@ const char PUERTA_DE_SALIDA = 'P';
 const char MATAFUEGOS = 'M';
 const char FUEGO = 'F';
 
+
 const int OBSTACULOS_POR_CUADRANTE = 10;
 const int MITAD_DE_COLUMNAS = 10;
 const int MITAD_DE_FILAS_TOTAL = 11;
@@ -69,7 +71,7 @@ const int POSICION_COLUMNA_STITCH = 10;
 const int POSICION_FILA_REUBEN = 5;
 const int POSICION_COLUMNA_REUBEN = 10;
 const int MAX_OBSTACULOS_POR_CUADRANTE = 10;
-const int MAX_OBSTACULOS_TOTAL = 20;
+const int MAX_OBSTACULOS_TOTAL = 21;
 const int MAX_CUCHILLOS = 2;
 const int MAX_HORNOS = 2;
 const int POSICION_INICIAL_STITCH_FILA = 1;
@@ -275,11 +277,10 @@ void anadir_obstaculos(juego_t* juego) {
 }
 
 void anadir_fuego_cuadrante_stitch(juego_t* juego){
-  int nuevo_tope = (*juego).tope_obstaculos ++;
-   while((*juego).tope_obstaculos < nuevo_tope) {
+  while((*juego).tope_obstaculos < 21) {
   int numero_fila_random = rand() % 8 + 1;
   int numero_columna_random = rand() % 19 + 1;
-  if(puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random) && no_hay_personaje(*juego, numero_fila_random, numero_columna_random) ){
+  if(puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_personaje(*juego, numero_fila_random, numero_columna_random)){
   anadir_obstaculo(juego, (*juego).tope_obstaculos, FUEGO, numero_fila_random, numero_columna_random);
   }
   }
@@ -288,8 +289,7 @@ void anadir_fuego_cuadrante_stitch(juego_t* juego){
 
 
 void anadir_fuego_cuadrante_reuben(juego_t* juego){
-  int nuevo_tope = (*juego).tope_obstaculos ++;
-  while((*juego).tope_obstaculos < nuevo_tope) {
+  while((*juego).tope_obstaculos < 21) {
   int numero_fila_random = rand() % 8 + 12;
   int numero_columna_random = rand() % 19 + 1;
   if(puedo_agregar(numero_fila_random, numero_columna_random) && no_hay_obstaculo(*juego, numero_fila_random, numero_columna_random) && no_hay_herramienta(*juego, numero_fila_random, numero_columna_random) && no_hay_ingredientes(*juego, numero_fila_random, numero_columna_random) && no_hay_puerta((*juego), numero_fila_random, numero_columna_random) && no_hay_personaje(*juego, numero_fila_random, numero_columna_random) ){
@@ -589,6 +589,7 @@ void inicializar_juego(juego_t* juego, int precio) {
  (*juego).stitch.objeto_en_mano = MANO_VACIA;
  (*juego).reuben.objeto_en_mano = MANO_VACIA;
  (*juego).precio_total = precio;
+ (*juego).comida_actual = MANO_VACIA;
 
  srand (( unsigned)time(NULL));
 
@@ -745,31 +746,47 @@ void chequear_pared(juego_t* juego, char movimiento){
   if((*juego).personaje_activo == STITCH){
     if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1))) {
     (*juego).stitch.posicion.col ++;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1))){
     (*juego).stitch.posicion.col --;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col))){
     (*juego).stitch.posicion.fil ++;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col))) {
     (*juego).stitch.posicion.fil --;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } 
       } 
   else if ((*juego).personaje_activo == REUBEN) {
     if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) {
     (*juego).reuben.posicion.col ++;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))){
     (*juego).reuben.posicion.col --;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)){
     (*juego).reuben.posicion.fil ++;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) {
     (*juego).reuben.posicion.fil --;
+    if((*juego).movimientos < 15){
     (*juego).movimientos ++;
+    }
   }
   }
  }
@@ -838,6 +855,37 @@ anadir_sandwich(juego);
 }
  }
 }
+
+void chequear_matafuegos(juego_t* juego) {
+  if((*juego).personaje_activo == STITCH){
+  int i = 0;
+  while (i < (*juego).tope_herramientas){
+  if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && ((*juego).herramientas[i].tipo == MATAFUEGOS)){
+    if ((*juego).stitch.objeto_en_mano == MANO_VACIA){
+  (*juego).herramientas[i].posicion.fil = -1;
+  (*juego).herramientas[i].posicion.col = -1;
+  (*juego).stitch.objeto_en_mano = MATAFUEGOS;
+  i = (*juego).tope_herramientas;
+    }
+  }
+  i++;
+    }
+  } else{
+  int i = 0;
+  while (i < (*juego).tope_herramientas){
+  if(!no_hay_herramienta(*juego,(*juego).reuben.posicion.fil,(*juego).reuben.posicion.col) && ((*juego).herramientas[i].tipo == MATAFUEGOS)){
+  if ((*juego).reuben.objeto_en_mano == MANO_VACIA){
+  (*juego).herramientas[i].posicion.fil = -1;
+  (*juego).herramientas[i].posicion.col = -1;
+  (*juego).reuben.objeto_en_mano = MATAFUEGOS;
+  i = (*juego).tope_herramientas;
+    }
+  } 
+  i++;
+    }
+
+  }
+    }
 
 // FIN CHEQUEOS
 
@@ -926,8 +974,8 @@ void tomar_ingrediente(juego_t* juego){
 void usar_cuchillo(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
   if(!no_hay_herramienta(*juego,(*juego).stitch.posicion.fil,(*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA)){ // despues validar matafuegos
-
-  for(int i = 0; i < juego->tope_herramientas; i++){
+  int i = 0;
+  while(i < juego->tope_herramientas){
    if((*juego).herramientas[i].posicion.fil == (*juego).stitch.posicion.fil && (*juego).herramientas[i].posicion.col == (*juego).stitch.posicion.col){
 
    for(int x = 0; x < juego->tope_comida; x++){
@@ -944,6 +992,7 @@ void usar_cuchillo(juego_t* juego){
           }
           }
   } 
+  i++;
           }   
   } 
  } else if ((*juego).personaje_activo == REUBEN){
@@ -951,6 +1000,13 @@ void usar_cuchillo(juego_t* juego){
  }
 }
 
+void usar_matafuegos(juego_t* juego){
+  if((*juego).personaje_activo == STITCH){
+
+ } else if ((*juego).personaje_activo == REUBEN){
+
+ }
+}
 
 void interactuar_con_mesa(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
@@ -1039,6 +1095,7 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   chequear_pared(juego, movimiento);
   chequear_puerta(juego);
   chequear_comidas(juego);
+  chequear_matafuegos(juego);
   switch(movimiento){
   case CAMBIAR_PERSONAJE: 
   personaje_activo(juego);
@@ -1049,14 +1106,19 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   case USAR_CUCHILLO:
   usar_cuchillo(juego);
   break;
+  case USAR_MATAFUEGOS:
+  usar_matafuegos(juego);
+  break;
   case INTERACTUAR_CON_MESA:
   interactuar_con_mesa(juego);
   break;
   case USAR_HORNO:
   interactuar_con_horno(juego);
   break;
+
   } 
   if((*juego).movimientos == 15){
+
     if((*juego).personaje_activo == STITCH){
    anadir_matafuegos_cuadrante_stitch(juego);
    anadir_fuego_cuadrante_stitch(juego);
@@ -1076,6 +1138,7 @@ void realizar_jugada(juego_t* juego, char movimiento) {
 
 int estado_juego(juego_t juego){
   int resultado = SIGUE_JUGANDO;
+  
   if(!no_hay_obstaculo(juego, juego.stitch.posicion.fil, juego.stitch.posicion.col) || !no_hay_obstaculo(juego, juego.reuben.posicion.fil, juego.reuben.posicion.col)){
     resultado = PERDIO;
   } else if(condicion_ganadora(juego)){
