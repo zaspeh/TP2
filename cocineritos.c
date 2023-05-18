@@ -78,6 +78,7 @@ const int POSICION_INICIAL_STITCH_FILA = 1;
 const int POSICION_INICIAL_STITCH_COLUMNA = 1;
 const int POSICION_INICIAL_REUBEN_FILA = 11;
 const int POSICION_INICIAL_REUBEN_COLUMNA = 1;
+const int MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO = 15;
 const int SIGUE_JUGANDO = 0;
 const int PERDIO = -1;
 const int GANO = 1;
@@ -130,6 +131,17 @@ bool no_hay_obstaculo(juego_t juego, int numero_fila_random, int numero_columna_
   bool libre = true;
   for(int i = 0; i < juego.tope_obstaculos; i++){
     if(numero_fila_random == juego.obstaculos[i].posicion.fil && numero_columna_random == juego.obstaculos[i].posicion.col) {
+      libre = false;
+    } 
+   }
+
+  return libre;
+}
+
+bool no_hay_fuego(juego_t juego, int numero_fila_random, int numero_columna_random){
+  bool libre = true;
+  for(int i = 0; i < juego.tope_obstaculos; i++){
+    if(numero_fila_random == juego.obstaculos[i].posicion.fil && numero_columna_random == juego.obstaculos[i].posicion.col && juego.obstaculos[i].tipo == FUEGO) {
       libre = false;
     } 
    }
@@ -742,24 +754,24 @@ void imprimir_terreno(juego_t juego){
 
 
 
-void chequear_pared(juego_t* juego, char movimiento){
+void chequear_movimiento(juego_t* juego, char movimiento){
   if((*juego).personaje_activo == STITCH){
-    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1))) {
+    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col + 1))) {
     (*juego).stitch.posicion.col ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1))){
+  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil,(*juego).stitch.posicion.col - 1))){
     (*juego).stitch.posicion.col --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col))){
+  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil + 1,(*juego).stitch.posicion.col))){
     (*juego).stitch.posicion.fil ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col))) {
+  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil - 1,(*juego).stitch.posicion.col))) {
     (*juego).stitch.posicion.fil --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
@@ -767,22 +779,22 @@ void chequear_pared(juego_t* juego, char movimiento){
   } 
       } 
   else if ((*juego).personaje_activo == REUBEN) {
-    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) {
+    if((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col + 1))) {
     (*juego).reuben.posicion.col ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))){
+  } else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1))) && no_hay_herramienta(*juego, (*juego).reuben.posicion.fil,((*juego).reuben.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil,(*juego).reuben.posicion.col - 1))){
     (*juego).reuben.posicion.col --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)){
+  } else if((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil + 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil + 1,(*juego).reuben.posicion.col))){
     (*juego).reuben.posicion.fil ++;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
     }
-  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) {
+  } else if((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col)) && no_hay_herramienta(*juego, ((*juego).reuben.posicion.fil - 1),(*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil - 1,(*juego).reuben.posicion.col))) {
     (*juego).reuben.posicion.fil --;
     if((*juego).movimientos < 15){
     (*juego).movimientos ++;
@@ -790,6 +802,7 @@ void chequear_pared(juego_t* juego, char movimiento){
   }
   }
  }
+
 
 
 
@@ -1002,9 +1015,33 @@ void usar_cuchillo(juego_t* juego){
 
 void usar_matafuegos(juego_t* juego){
   if((*juego).personaje_activo == STITCH){
-
+  int i = 0;
+ while(i < (*juego).tope_obstaculos){
+  if((*juego).obstaculos[i].tipo == FUEGO){
+ if((calcular_distancia((*juego).stitch.posicion.fil, (*juego).stitch.posicion.col, (*juego).obstaculos[i].posicion.fil,(*juego).obstaculos[i].posicion.col) <= 2) && ((*juego).stitch.objeto_en_mano == MATAFUEGOS)){
+  (*juego).stitch.objeto_en_mano = MANO_VACIA;
+  (*juego).tope_obstaculos --;
+  (*juego).tope_herramientas --;
+  (*juego).movimientos = 0;
+  i = (*juego).tope_obstaculos;
+ }
+  }
+i++;
+}
  } else if ((*juego).personaje_activo == REUBEN){
-
+  int i = 0;
+ while(i < (*juego).tope_obstaculos){
+  if((*juego).obstaculos[i].tipo == FUEGO){
+ if((calcular_distancia((*juego).reuben.posicion.fil, (*juego).reuben.posicion.col, (*juego).obstaculos[i].posicion.fil,(*juego).obstaculos[i].posicion.col) <= 2) && ((*juego).reuben.objeto_en_mano == MATAFUEGOS)){
+  (*juego).reuben.objeto_en_mano = MANO_VACIA;
+  (*juego).tope_obstaculos --;
+  (*juego).tope_herramientas --;
+  (*juego).movimientos = 0;
+  i = (*juego).tope_obstaculos;
+ }
+  }
+i++;
+}
  }
 }
 
@@ -1092,10 +1129,9 @@ void interactuar_con_horno(juego_t* juego){
 
 
 void realizar_jugada(juego_t* juego, char movimiento) {
-  chequear_pared(juego, movimiento);
+  chequear_movimiento(juego, movimiento);
   chequear_puerta(juego);
   chequear_comidas(juego);
-  chequear_matafuegos(juego);
   switch(movimiento){
   case CAMBIAR_PERSONAJE: 
   personaje_activo(juego);
@@ -1117,8 +1153,8 @@ void realizar_jugada(juego_t* juego, char movimiento) {
   break;
 
   } 
-  if((*juego).movimientos == 15){
-
+  if((*juego).movimientos == MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO){
+  chequear_matafuegos(juego);
     if((*juego).personaje_activo == STITCH){
    anadir_matafuegos_cuadrante_stitch(juego);
    anadir_fuego_cuadrante_stitch(juego);
