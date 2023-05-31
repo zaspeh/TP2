@@ -127,6 +127,15 @@ void inicializar_nivel_paredes(juego_t *juego)
 
 // VALIDACIONES
 
+
+/* bool movimiento_es_valido(int movimiento){
+  bool es_valido = false;
+  if(movimiento == MOVER_ABAJO || movimiento == MOVER_ARRIBA || movimiento == MOVER_DERECHA || movimiento == MOVER_IZQUIERDA || movimiento == USAR_CUCHILLO || movimiento == USAR_HORNO || movimiento == USAR_MATAFUEGOS || movimiento == INTERACTUAR_CON_MESA  || movimiento == CAMBIAR_PERSONAJE){
+    es_valido = true;
+  }
+  return es_valido;
+} */
+
 // Pre: -
 // Pos: Valida que no este por encima de la mesa y por debajo
 
@@ -375,14 +384,14 @@ void anadir_herramienta(juego_t *juego, int tope_herramientas, char tipo, int fi
 
 void numeros_aleatorios_primer_cuadrante(int *numero_fila_random, int *numero_columna_random)
 {
-  *numero_fila_random = rand() % NUMERO_BASE_FILAS_RANDOM_PRIMER_CUADRANTE + VARIACION_FILAS_RANDOM_PRIMER_CUADRANTE;
-  *numero_columna_random = rand() % 1 + VARIACION_COLUMNAS_RANDOM;
+  *numero_fila_random = rand() % VARIACION_FILAS_RANDOM_PRIMER_CUADRANTE + NUMERO_BASE_FILAS_RANDOM_PRIMER_CUADRANTE;
+  *numero_columna_random = rand() % VARIACION_COLUMNAS_RANDOM + 1;
 }
 
 void numeros_aleatorios_segundo_cuadrante(int *numero_fila_random, int *numero_columna_random)
 {
-  *numero_fila_random = rand() % NUMERO_BASE_FILAS_RANDOM_SEGUNDO_CUADRANTE + VARIACION_FILAS_RANDOM_SEGUNDO_CUADRANTE;
-  *numero_columna_random = rand() % 1 + VARIACION_COLUMNAS_RANDOM;
+  *numero_fila_random = rand() % 9 + 11;
+  *numero_columna_random = rand() % VARIACION_COLUMNAS_RANDOM + 1;
 }
 
 // FIN HERRAMIENTAS DE PROGRAMACION
@@ -809,7 +818,7 @@ void limpiar_matriz(char matriz[MAX_FIL][MAX_COL])
 
 void incorporar_paredes(juego_t *juego, char matriz[MAX_FIL][MAX_COL])
 {
-  for (int x = 0; x <= juego->tope_paredes; x++)
+  for (int x = 0; x < juego->tope_paredes; x++)
   {
     for (int i = 0; i < MAX_FIL; i++)
     {
@@ -949,78 +958,42 @@ void imprimir_terreno(juego_t juego)
 // Pre: -
 // Pos: Chequea que el personaje no se meta en la pared ni en el fuego, si el personaje activo es reuben se fija que no colisione con un horno
 
-void chequear_movimiento(juego_t *juego, char movimiento)
+void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
 {
-  if ((*juego).personaje_activo == STITCH)
-  {
-    if ((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col + 1)))
+
+    if ((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && (no_hay_fuego(*juego, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && no_hay_horno(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col + 1)))
     {
-      (*juego).stitch.posicion.col++;
+      (*jugador).posicion.col++;
       if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
       {
         (*juego).movimientos++;
       }
     }
-    else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col - 1)))
+    else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && (no_hay_fuego(*juego, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && no_hay_horno(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col - 1)))
     {
-      (*juego).stitch.posicion.col--;
+      (*jugador).posicion.col--;
       if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
       {
         (*juego).movimientos++;
       }
     }
-    else if ((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil + 1, (*juego).stitch.posicion.col)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil + 1, (*juego).stitch.posicion.col)))
+    else if ((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && (no_hay_fuego(*juego, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && no_hay_horno(*juego, (*juego).reuben.posicion.fil + 1, ((*juego).reuben.posicion.col)))
     {
-      (*juego).stitch.posicion.fil++;
+      (*jugador).posicion.fil++;
       if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
       {
         (*juego).movimientos++;
       }
     }
-    else if ((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*juego).stitch.posicion.fil - 1, (*juego).stitch.posicion.col)) && (no_hay_fuego(*juego, (*juego).stitch.posicion.fil - 1, (*juego).stitch.posicion.col)))
+    else if ((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && (no_hay_fuego(*juego, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && no_hay_horno(*juego, (*juego).reuben.posicion.fil - 1, ((*juego).reuben.posicion.col)))
     {
-      (*juego).stitch.posicion.fil--;
+      (*jugador).posicion.fil--;
       if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
       {
         (*juego).movimientos++;
       }
     }
-  }
-  else if ((*juego).personaje_activo == REUBEN)
-  {
-    if ((movimiento == MOVER_DERECHA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col + 1))) && no_hay_horno(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col + 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col + 1)))
-    {
-      (*juego).reuben.posicion.col++;
-      if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
-      {
-        (*juego).movimientos++;
-      }
-    }
-    else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col - 1))) && no_hay_horno(*juego, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col - 1)) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col - 1)))
-    {
-      (*juego).reuben.posicion.col--;
-      if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
-      {
-        (*juego).movimientos++;
-      }
-    }
-    else if ((movimiento == MOVER_ABAJO) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil + 1), (*juego).reuben.posicion.col)) && no_hay_horno(*juego, ((*juego).reuben.posicion.fil + 1), (*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil + 1, (*juego).reuben.posicion.col)))
-    {
-      (*juego).reuben.posicion.fil++;
-      if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
-      {
-        (*juego).movimientos++;
-      }
-    }
-    else if ((movimiento == MOVER_ARRIBA) && (no_hay_pared(*juego, ((*juego).reuben.posicion.fil - 1), (*juego).reuben.posicion.col)) && no_hay_horno(*juego, ((*juego).reuben.posicion.fil - 1), (*juego).reuben.posicion.col) && (no_hay_fuego(*juego, (*juego).reuben.posicion.fil - 1, (*juego).reuben.posicion.col)))
-    {
-      (*juego).reuben.posicion.fil--;
-      if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
-      {
-        (*juego).movimientos++;
-      }
-    }
-  }
+  
 }
 
 // Pre: -
@@ -1108,44 +1081,23 @@ void chequear_comidas(juego_t *juego)
 // Pre: -
 // Pos: Si el personaje activo se encuentra por encima de un matafuego con sus manos vacias, entonces el personaje toma el matafuegos
 
-void chequear_matafuegos(juego_t *juego)
+void chequear_matafuegos(juego_t *juego, personaje_t *jugador)
 {
-  if ((*juego).personaje_activo == STITCH)
-  {
     int i = 0;
     while (i < (*juego).tope_herramientas)
     {
-      if (!no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).herramientas[i].posicion.fil == (*juego).stitch.posicion.fil) && ((*juego).herramientas[i].posicion.col == (*juego).stitch.posicion.col) && ((*juego).herramientas[i].tipo == MATAFUEGOS))
+      if (!no_hay_herramienta(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*juego).herramientas[i].posicion.fil == (*jugador).posicion.fil) && ((*juego).herramientas[i].posicion.col == (*jugador).posicion.col) && ((*juego).herramientas[i].tipo == MATAFUEGOS))
       {
-        if ((*juego).stitch.objeto_en_mano == MANO_VACIA)
+        if ((*jugador).objeto_en_mano == MANO_VACIA)
         {
           (*juego).herramientas[i].posicion.fil = -1;
           (*juego).herramientas[i].posicion.col = -1;
-          (*juego).stitch.objeto_en_mano = MATAFUEGOS;
+          (*jugador).objeto_en_mano = MATAFUEGOS;
           i = (*juego).tope_herramientas;
         }
       }
       i++;
     }
-  }
-  else
-  {
-    int i = 0;
-    while (i < (*juego).tope_herramientas)
-    {
-      if (!no_hay_herramienta(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).herramientas[i].tipo == MATAFUEGOS))
-      {
-        if (((*juego).reuben.objeto_en_mano == MANO_VACIA))
-        {
-          (*juego).herramientas[i].posicion.fil = -1;
-          (*juego).herramientas[i].posicion.col = -1;
-          (*juego).reuben.objeto_en_mano = MATAFUEGOS;
-          i = (*juego).tope_herramientas;
-        }
-      }
-      i++;
-    }
-  }
 }
 
 // Pre: -
@@ -1194,69 +1146,36 @@ void personaje_activo(juego_t *juego)
 // Pre: -
 // Pos: Dependiendo de si el personaje activo este arriba de un ingrediente y tiene sus manos vacias, podra tomarlo, a su vez si tiene algo en la mano no podra, y por ultimo si quiere soltar el ingrediente puede hacerlo si no hay nada en su posicion.
 
-void tomar_ingrediente(juego_t *juego)
+void tomar_ingrediente(juego_t *juego, personaje_t *jugador)
 {
 
-  if ((*juego).personaje_activo == STITCH)
-  {
     for (int i = 0; i < (*juego).tope_comida; i++)
     {
       for (int j = 0; j < (*juego).comida[i].tope_ingredientes; j++)
       {
-        if (!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA))
+        if (!no_hay_ingredientes(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*jugador).objeto_en_mano == MANO_VACIA))
         {
 
-          if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).stitch.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).stitch.posicion.col))
+          if (((*juego).comida[i].ingrediente[j].posicion.fil == (*jugador).posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*jugador).posicion.col))
           {
-            (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
+            (*jugador).objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
             (*juego).comida[i].ingrediente[j].posicion.fil = -1;
             (*juego).comida[i].ingrediente[j].posicion.col = -1;
           }
         }
-        else if (!no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA))
+        else if (!no_hay_ingredientes(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*jugador).objeto_en_mano != MANO_VACIA))
         {
           j = (*juego).comida[i].tope_ingredientes;
           i = (*juego).tope_comida;
         }
-        else if (no_hay_ingredientes(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).stitch.objeto_en_mano))
+        else if (no_hay_ingredientes(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && no_hay_herramienta(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*jugador).objeto_en_mano))
         {
-          (*juego).comida[i].ingrediente[j].posicion.fil = (*juego).stitch.posicion.fil;
-          (*juego).comida[i].ingrediente[j].posicion.col = (*juego).stitch.posicion.col;
-          (*juego).stitch.objeto_en_mano = MANO_VACIA;
+          (*juego).comida[i].ingrediente[j].posicion.fil = (*jugador).posicion.fil;
+          (*juego).comida[i].ingrediente[j].posicion.col = (*jugador).posicion.col;
+          (*jugador).objeto_en_mano = MANO_VACIA;
         }
       }
     }
-  }
-  else if ((*juego).personaje_activo == REUBEN)
-  {
-    for (int i = 0; i < (*juego).tope_comida; i++)
-    {
-      for (int j = 0; j < (*juego).comida[i].tope_ingredientes; j++)
-      {
-        if (!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA))
-        {
-
-          if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).reuben.posicion.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).reuben.posicion.col))
-          {
-            (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
-            (*juego).comida[i].ingrediente[j].posicion.fil = -1;
-            (*juego).comida[i].ingrediente[j].posicion.col = -1;
-          }
-        }
-        else if (!no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && ((*juego).reuben.objeto_en_mano != MANO_VACIA))
-        {
-          j = (*juego).comida[i].tope_ingredientes;
-          i = (*juego).tope_comida;
-        }
-        else if (no_hay_ingredientes(*juego, (*juego).reuben.posicion.fil, (*juego).reuben.posicion.col) && no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*juego).reuben.objeto_en_mano))
-        {
-          (*juego).comida[i].ingrediente[j].posicion.fil = (*juego).reuben.posicion.fil;
-          (*juego).comida[i].ingrediente[j].posicion.col = (*juego).reuben.posicion.col;
-          (*juego).reuben.objeto_en_mano = MANO_VACIA;
-        }
-      }
-    }
-  }
 }
 
 // Pre: -
@@ -1298,18 +1217,17 @@ void usar_cuchillo(juego_t *juego)
 // Pre: -
 // Pos: permite al personaje_activo apagar un fuego cuando use el matafuegos a distancia manhattan <= 2 del mismo (con el matafuegos en la mano).
 
-void usar_matafuegos(juego_t *juego)
+void usar_matafuegos(juego_t *juego, personaje_t *jugador)
 {
-  if ((*juego).personaje_activo == STITCH)
-  {
+
     int i = 0;
     while (i < (*juego).tope_obstaculos)
     {
       if ((*juego).obstaculos[i].tipo == FUEGO)
       {
-        if ((calcular_distancia((*juego).stitch.posicion.fil, (*juego).stitch.posicion.col, (*juego).obstaculos[i].posicion.fil, (*juego).obstaculos[i].posicion.col) <= 2) && ((*juego).stitch.objeto_en_mano == MATAFUEGOS))
+        if ((calcular_distancia((*jugador).posicion.fil, (*jugador).posicion.col, (*juego).obstaculos[i].posicion.fil, (*juego).obstaculos[i].posicion.col) <= 2) && ((*jugador).objeto_en_mano == MATAFUEGOS))
         {
-          (*juego).stitch.objeto_en_mano = MANO_VACIA;
+          (*jugador).objeto_en_mano = MANO_VACIA;
           (*juego).tope_obstaculos--;
           (*juego).tope_herramientas--;
           (*juego).movimientos = 0;
@@ -1318,35 +1236,17 @@ void usar_matafuegos(juego_t *juego)
       }
       i++;
     }
-  }
-  else if ((*juego).personaje_activo == REUBEN)
-  {
-    int i = 0;
-    while (i < (*juego).tope_obstaculos)
-    {
-      if ((*juego).obstaculos[i].tipo == FUEGO)
-      {
-        if ((calcular_distancia((*juego).reuben.posicion.fil, (*juego).reuben.posicion.col, (*juego).obstaculos[i].posicion.fil, (*juego).obstaculos[i].posicion.col) <= 2) && ((*juego).reuben.objeto_en_mano == MATAFUEGOS))
-        {
-          (*juego).reuben.objeto_en_mano = MANO_VACIA;
-          (*juego).tope_obstaculos--;
-          (*juego).tope_herramientas--;
-          (*juego).movimientos = 0;
-          i = (*juego).tope_obstaculos;
-        }
-      }
-      i++;
-    }
-  }
+  
+ 
 }
 
 // Pre: -
 // Pos: Permite a los personajes poner y dejar ingredientes en la mesa
 
-void interactuar_con_mesa(juego_t *juego)
+void interactuar_con_mesa(juego_t *juego, personaje_t *jugador)
 {
 
-  if (((*juego).personaje_activo == STITCH) && (calcular_distancia(juego->stitch.posicion.fil, juego->stitch.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1))
+  if ((calcular_distancia((*jugador).posicion.fil, (*jugador).posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1))
   {
 
     int i = 0;
@@ -1357,15 +1257,15 @@ void interactuar_con_mesa(juego_t *juego)
       while (j < juego->comida[i].tope_ingredientes)
       {
 
-        if ((juego->comida[i].ingrediente[j].tipo == juego->stitch.objeto_en_mano) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col))
+        if ((juego->comida[i].ingrediente[j].tipo == (*jugador).objeto_en_mano) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col))
         {
           juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
           juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
-          juego->stitch.objeto_en_mano = MANO_VACIA;
+          (*jugador).objeto_en_mano = MANO_VACIA;
         }
         else if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA))
         {
-          (*juego).stitch.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
+          (*jugador).objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
           (*juego).comida[i].ingrediente[j].posicion.fil = -1;
           (*juego).comida[i].ingrediente[j].posicion.col = -1;
         }
@@ -1373,44 +1273,12 @@ void interactuar_con_mesa(juego_t *juego)
         {
           i = juego->tope_comida;
           j = juego->comida[i].tope_ingredientes;
+        } else {
+          printf("hola\n");
         }
-        i++;
         j++;
       }
-    }
-  }
-  else if (((*juego).personaje_activo == REUBEN) && (calcular_distancia(juego->reuben.posicion.fil, juego->reuben.posicion.col, (*juego).mesa.fil, (*juego).mesa.col) <= 1))
-  {
-
-    int i = 0;
-    int j = 0;
-
-    while (i < juego->tope_comida)
-    {
-      while (j < juego->comida[i].tope_ingredientes)
-      {
-
-        if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).reuben.objeto_en_mano == MANO_VACIA))
-        {
-          (*juego).reuben.objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
-          (*juego).comida[i].ingrediente[j].posicion.fil = -1;
-          (*juego).comida[i].ingrediente[j].posicion.col = -1;
-        }
-        else if ((juego->comida[i].ingrediente[j].tipo == juego->reuben.objeto_en_mano) && no_hay_ingredientes(*juego, (*juego).mesa.fil, (*juego).mesa.col))
-        {
-          juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
-          juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
-          juego->reuben.objeto_en_mano = MANO_VACIA;
-        }
-
-        else if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).reuben.objeto_en_mano != MANO_VACIA))
-        {
-          i = juego->tope_comida;
-          j = juego->comida[i].tope_ingredientes;
-        }
-        i++;
-        j++;
-      }
+      i++;
     }
   }
 }
@@ -1451,22 +1319,14 @@ void interactuar_con_horno(juego_t *juego)
   }
 }
 
-// FIN MOVIMIENTOS
-
-void realizar_jugada(juego_t *juego, char movimiento)
-{
-
-  chequear_movimiento(juego, movimiento);
-  chequear_puerta(juego);
-  chequear_comidas(juego);
-  chequear_matafuegos(juego);
+void chequear_jugada(juego_t *juego, char movimiento, personaje_t *jugador){
   switch (movimiento)
   {
   case CAMBIAR_PERSONAJE:
     personaje_activo(juego);
     break;
   case TOMAR_ALIMENTO:
-    tomar_ingrediente(juego);
+    tomar_ingrediente(juego, &(*jugador));
     break;
   case USAR_CUCHILLO:
     if (!hay_fuego_en_alguna_parte(*juego))
@@ -1475,19 +1335,35 @@ void realizar_jugada(juego_t *juego, char movimiento)
     }
     break;
   case USAR_MATAFUEGOS:
-    usar_matafuegos(juego);
+    usar_matafuegos(juego, &(*jugador));
     break;
   case INTERACTUAR_CON_MESA:
     if (!hay_fuego_en_alguna_parte(*juego))
     {
-      interactuar_con_mesa(juego);
+    interactuar_con_mesa(juego, &(*jugador));
     }
     break;
   case USAR_HORNO:
     interactuar_con_horno(juego);
     break;
   }
+}
+// FIN MOVIMIENTOS
 
+void realizar_jugada(juego_t *juego, char movimiento)
+{
+  if((*juego).personaje_activo == REUBEN){
+    chequear_movimiento(juego, movimiento, &(*juego).reuben);
+    chequear_matafuegos(juego, &(*juego).reuben);
+    chequear_puerta(juego);
+    chequear_jugada(juego, movimiento, &(*juego).reuben);
+  } else {
+    chequear_movimiento(juego, movimiento, &(*juego).stitch);
+    chequear_matafuegos(juego, &(*juego).stitch);
+    chequear_jugada(juego, movimiento, &(*juego).stitch);
+  }
+
+  chequear_comidas(juego);
   chequear_aparecer_un_fuego(juego);
 }
 
