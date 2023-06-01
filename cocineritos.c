@@ -26,10 +26,17 @@ const char PARED = '#';
 const char MESA = '_';
 const char SALIDA = 'P';
 const char AGUJERO = 'A';
+const char FUEGO = 'F';
 const char CUCHILLO = 'C';
 const char HORNO = 'H';
+const char PUERTA_DE_SALIDA = 'P';
+const char MATAFUEGOS = 'M';
 const char STITCH = 'S';
 const char REUBEN = 'R';
+const char ENSALADA = 'E';
+const char PIZZA = 'P';
+const char HAMBURGUESA = 'H';
+const char SANDWICH = 'S';
 const char LECHUGA = 'L';
 const char TOMATE = 'T';
 const char JAMON = 'J';
@@ -42,13 +49,7 @@ const char MOVER_DERECHA = 'D';
 const char MOVER_IZQUIERDA = 'A';
 const char MOVER_ARRIBA = 'W';
 const char MOVER_ABAJO = 'S';
-const char ENSALADA = 'E';
-const char PIZZA = 'P';
-const char HAMBURGUESA = 'H';
-const char SANDWICH = 'S';
-const char PUERTA_DE_SALIDA = 'P';
-const char MATAFUEGOS = 'M';
-const char FUEGO = 'F';
+
 
 const int OBSTACULOS_POR_CUADRANTE = 10;
 const int MITAD_DE_COLUMNAS = 10;
@@ -1023,6 +1024,7 @@ void chequear_puerta(juego_t *juego)
             (*juego).comida_lista[(*juego).tope_comida_lista].esta_cortado = (*juego).comida[i].ingrediente[j].esta_cortado;
             (*juego).tope_comida_lista++;
             (*juego).reuben.objeto_en_mano = MANO_VACIA;
+            printf("R: Una comida menos!\n");
           }
         }
       }
@@ -1096,6 +1098,7 @@ void chequear_matafuegos(juego_t *juego, personaje_t *jugador)
           (*juego).herramientas[i].posicion.col = -1;
           (*jugador).objeto_en_mano = MATAFUEGOS;
           i = (*juego).tope_herramientas;
+          printf("%c: Agarre el matafuegos!\n", (*jugador).tipo);
         }
       }
       i++;
@@ -1142,6 +1145,7 @@ void personaje_activo(juego_t *juego)
   {
     (*juego).personaje_activo = STITCH;
   }
+  printf("El personaje activo actual es %c!\n", (*juego).personaje_activo);
 }
 
 // Pre: -
@@ -1162,18 +1166,21 @@ void tomar_ingrediente(juego_t *juego, personaje_t *jugador)
             (*jugador).objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
             (*juego).comida[i].ingrediente[j].posicion.fil = -1;
             (*juego).comida[i].ingrediente[j].posicion.col = -1;
+            printf("%c: Tome un ingrediente del tipo %c\n",(*jugador).tipo, (*juego).comida[i].ingrediente[j].tipo);
           }
         }
         else if (!no_hay_ingredientes(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*jugador).objeto_en_mano != MANO_VACIA))
         {
           j = (*juego).comida[i].tope_ingredientes;
           i = (*juego).tope_comida;
+          printf("%c: Tengo las manos ocupadas :/\n",(*jugador).tipo);
         }
         else if (no_hay_ingredientes(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && no_hay_herramienta(*juego, (*jugador).posicion.fil, (*jugador).posicion.col) && ((*juego).comida[i].ingrediente[j].tipo == (*jugador).objeto_en_mano))
         {
           (*juego).comida[i].ingrediente[j].posicion.fil = (*jugador).posicion.fil;
           (*juego).comida[i].ingrediente[j].posicion.col = (*jugador).posicion.col;
           (*jugador).objeto_en_mano = MANO_VACIA;
+          printf("%c: Solte un ingrediente del tipo %c\n", (*jugador).tipo, (*juego).comida[i].ingrediente[j].tipo);
         }
       }
     }
@@ -1187,7 +1194,7 @@ void usar_cuchillo(juego_t *juego)
   if ((*juego).personaje_activo == STITCH)
   {
     if (!no_hay_herramienta(*juego, (*juego).stitch.posicion.fil, (*juego).stitch.posicion.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA))
-    { // despues validar matafuegos
+    { 
       int i = 0;
       while (i < juego->tope_herramientas)
       {
@@ -1201,6 +1208,7 @@ void usar_cuchillo(juego_t *juego)
               if ((juego->comida[x].ingrediente[y].tipo == (*juego).stitch.objeto_en_mano) && (juego->comida[x].ingrediente[y].esta_cortado == false))
               {
                 juego->comida[x].ingrediente[y].esta_cortado = true;
+                printf("S: Corte el ingrediente que tenia en la mano jeje\n");
               }
               else if (((juego->comida[x].ingrediente[y].tipo == (*juego).stitch.objeto_en_mano) && (juego->comida[x].ingrediente[y].esta_cortado == false)) || juego->stitch.objeto_en_mano == MANO_VACIA)
               {
@@ -1233,6 +1241,7 @@ void usar_matafuegos(juego_t *juego, personaje_t *jugador)
           (*juego).tope_herramientas--;
           (*juego).movimientos = 0;
           i = (*juego).tope_obstaculos;
+          printf("%c: Use el matafuegos! Pero magicamente desaparecio :O\n",(*jugador).tipo);
         }
       }
       i++;
@@ -1263,19 +1272,20 @@ void interactuar_con_mesa(juego_t *juego, personaje_t *jugador)
           juego->comida[i].ingrediente[j].posicion.fil = (*juego).mesa.fil;
           juego->comida[i].ingrediente[j].posicion.col = (*juego).mesa.col;
           (*jugador).objeto_en_mano = MANO_VACIA;
+          printf("%c: Deje el ingrediente en la mesa, aunque esta un poco sucia :3\n", (*jugador).tipo);
         }
         else if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano == MANO_VACIA))
         {
           (*jugador).objeto_en_mano = (*juego).comida[i].ingrediente[j].tipo;
           (*juego).comida[i].ingrediente[j].posicion.fil = -1;
           (*juego).comida[i].ingrediente[j].posicion.col = -1;
+          printf("%c: Tome el ingrediente de la mesa, esta lleno de polvo :v\n", (*jugador).tipo);
         }
         else if (((*juego).comida[i].ingrediente[j].posicion.fil == (*juego).mesa.fil) && ((*juego).comida[i].ingrediente[j].posicion.col == (*juego).mesa.col) && ((*juego).stitch.objeto_en_mano != MANO_VACIA))
         {
+          printf("%c: No hay espacio en la mesa!\n", (*jugador).tipo);
           i = juego->tope_comida;
           j = juego->comida[i].tope_ingredientes;
-        } else {
-          printf("hola\n");
         }
         j++;
       }
@@ -1308,6 +1318,7 @@ void interactuar_con_horno(juego_t *juego)
             if (((*juego).reuben.objeto_en_mano == MASA || (*juego).reuben.objeto_en_mano == CARNE || (*juego).reuben.objeto_en_mano == MILANESA) && ((*juego).comida[j].ingrediente[k].tipo == (*juego).reuben.objeto_en_mano) && !(*juego).comida[j].ingrediente[k].esta_cocinado)
             {
               (*juego).comida[j].ingrediente[k].esta_cocinado = true;
+              printf("R: Cocinadisimo!\n");
               k = (*juego).comida[j].tope_ingredientes;
               j = (*juego).tope_comida;
             }
