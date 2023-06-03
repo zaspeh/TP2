@@ -5,6 +5,12 @@
 #include "cocineritos.h"
 #include "chambuchito.h"
 
+#define TOMAR_ALIMENTO 'R'
+#define CAMBIAR_PERSONAJE 'X'
+#define USAR_CUCHILLO 'C'
+#define INTERACTUAR_CON_MESA 'T'
+#define USAR_HORNO 'H'
+#define USAR_MATAFUEGOS 'M'
 #define MAX_INGREDIENTES 10
 #define MAX_PAREDES 200
 #define MAX_HERRAMIENTAS 50
@@ -13,13 +19,11 @@
 #define MAX_COL 21
 #define MAX_FIL 21
 #define MAX_PAREDES 200
-#define TOMAR_ALIMENTO 'R'
-#define CAMBIAR_PERSONAJE 'X'
-#define USAR_CUCHILLO 'C'
-#define INTERACTUAR_CON_MESA 'T'
-#define USAR_HORNO 'H'
-#define USAR_MATAFUEGOS 'M'
 
+const char MOVER_DERECHA = 'D';
+const char MOVER_IZQUIERDA = 'A';
+const char MOVER_ARRIBA = 'W';
+const char MOVER_ABAJO = 'S';
 const char VACIO = '.';
 const char MANO_VACIA = 'V';
 const char PARED = '#';
@@ -45,16 +49,20 @@ const char MASA = 'O';
 const char CARNE = 'B';
 const char MILANESA = 'I';
 const char PAN = 'N';
-const char MOVER_DERECHA = 'D';
-const char MOVER_IZQUIERDA = 'A';
-const char MOVER_ARRIBA = 'W';
-const char MOVER_ABAJO = 'S';
 
-const int OBSTACULOS_POR_CUADRANTE = 10;
 const int MITAD_DE_COLUMNAS = 10;
 const int MITAD_DE_FILAS_TOTAL = 11;
 const int MITAD_FILAS_PRIMER_CUADRANTE = 5;
 const int MITAD_FILAS_SEGUNDO_CUADRANTE = 15;
+const int NUMERO_BASE_FILAS_RANDOM_PRIMER_CUADRANTE = 1;
+const int NUMERO_BASE_FILAS_RANDOM_SEGUNDO_CUADRANTE = 11;
+const int VARIACION_FILAS_RANDOM_PRIMER_CUADRANTE = 9;
+const int VARIACION_FILAS_RANDOM_SEGUNDO_CUADRANTE = 9;
+const int NUMERO_BASE_COLUMNAS_RANDOM = 1;
+const int VARIACION_COLUMNAS_RANDOM = 19;
+const int SIGUE_JUGANDO = 0;
+const int PERDIO = -1;
+const int GANO = 1;
 const int CATEGORIA_PRECIO_1 = 100;
 const int CATEGORIA_PRECIO_2 = 150;
 const int CANTIDAD_INGREDIENTES_ENSALADA = 2;
@@ -76,37 +84,19 @@ const int CANTIDAD_JAMONES_SANDWICH = 1;
 const int CANTIDAD_QUESOS_SANDWICH = 1;
 const int CANTIDAD_PAN_SANDWICH = 1;
 const int CANTIDAD_MILANESAS_SANDWICH = 1;
+const int CANTIDAD_STITCHS = 1;
+const int CANTIDAD_REUBENS = 1;
 const int POSICION_FILA_MESA = 10;
 const int POSICION_COLUMNA_MESA = 10;
 const int FILA_ARRIBA_DE_MESA = 9;
 const int FILA_ABAJO_DE_MESA = 11;
-const int POSICION_FILA_SALIDA = 20;
-const int POSICION_COLUMNA_SALIDA = 10;
-const int POSICION_FILA_STITCH = 5;
-const int POSICION_COLUMNA_STITCH = 10;
-const int POSICION_FILA_REUBEN = 5;
-const int POSICION_COLUMNA_REUBEN = 10;
-const int CANTIDAD_STITCHS = 1;
-const int CANTIDAD_REUBENS = 1;
-const int MAX_AGUJEROS_POR_CUADRANTE = 10;
-const int MAX_FUEGOS = 1;
 const int CANTIDAD_CUCHILLOS = 2;
 const int CANTIDAD_HORNOS = 2;
 const int CANTIDAD_MATAFUEGOS = 1;
-const int POSICION_INICIAL_STITCH_FILA = 1;
-const int POSICION_INICIAL_STITCH_COLUMNA = 1;
-const int POSICION_INICIAL_REUBEN_FILA = 11;
-const int POSICION_INICIAL_REUBEN_COLUMNA = 1;
+const int OBSTACULOS_POR_CUADRANTE = 10;
+const int MAX_AGUJEROS_POR_CUADRANTE = 10;
+const int MAX_FUEGOS = 1;
 const int MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO = 15;
-const int NUMERO_BASE_FILAS_RANDOM_PRIMER_CUADRANTE = 1;
-const int NUMERO_BASE_FILAS_RANDOM_SEGUNDO_CUADRANTE = 11;
-const int VARIACION_FILAS_RANDOM_PRIMER_CUADRANTE = 9;
-const int VARIACION_FILAS_RANDOM_SEGUNDO_CUADRANTE = 9;
-const int NUMERO_BASE_COLUMNAS_RANDOM = 1;
-const int VARIACION_COLUMNAS_RANDOM = 19;
-const int SIGUE_JUGANDO = 0;
-const int PERDIO = -1;
-const int GANO = 1;
 
 // Pre: -
 // pos: Añade la localizacion de las paredes al struct juego_t juego
@@ -330,14 +320,14 @@ int calcular_distancia(int fila1, int columna1, int fila2, int columna2)
 // Pre: Pasarle un struct y tope ya inicializado.
 // Pos: Añade un ingrediente al vector segun el tipo, fila y columna que le pases.
 
-void anadir_ingrediente_particular(comida_t comida[MAX_COMIDA], int tope_comida, int tope_ingrediente, char tipo, int fila, int col)
+void anadir_ingrediente_particular(comida_t comida[MAX_COMIDA], int tope_comida, int *tope_ingrediente, char tipo, int fila, int col)
 {
-  comida[tope_comida].ingrediente[tope_ingrediente].posicion.fil = fila;
-  comida[tope_comida].ingrediente[tope_ingrediente].posicion.col = col;
-  comida[tope_comida].ingrediente[tope_ingrediente].tipo = tipo;
-  comida[tope_comida].ingrediente[tope_ingrediente].esta_cortado = false;
-  comida[tope_comida].ingrediente[tope_ingrediente].esta_cocinado = false;
-  comida[tope_comida].tope_ingredientes++;
+  comida[tope_comida].ingrediente[*tope_ingrediente].posicion.fil = fila;
+  comida[tope_comida].ingrediente[*tope_ingrediente].posicion.col = col;
+  comida[tope_comida].ingrediente[*tope_ingrediente].tipo = tipo;
+  comida[tope_comida].ingrediente[*tope_ingrediente].esta_cortado = false;
+  comida[tope_comida].ingrediente[*tope_ingrediente].esta_cocinado = false;
+  (*tope_ingrediente)++;
   // ejemplo de uso :
   //   anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
 }
@@ -363,7 +353,8 @@ void anadir_herramienta(objeto_t herramientas[MAX_HERRAMIENTAS], int *tope_herra
   herramientas[*tope_herramientas].tipo = tipo;
   (*tope_herramientas)++;
 }
-
+// Pre: -
+// Pos: devuelve un struct del tipo coordenada_t con una fila y columna aleatoria del primer cuadrante.
 coordenada_t numeros_aleatorios_primer_cuadrante()
 {
   coordenada_t coordenada;
@@ -372,6 +363,8 @@ coordenada_t numeros_aleatorios_primer_cuadrante()
   return coordenada;
 }
 
+// Pre: -
+// Pos: devuelve un struct del tipo coordenada_t con una fila y columna aleatoria del segundo cuadrante.
 coordenada_t numeros_aleatorios_segundo_cuadrante()
 {
   coordenada_t coordenada;
@@ -551,7 +544,7 @@ void anadir_ensalada(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -560,7 +553,7 @@ void anadir_ensalada(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -582,7 +575,7 @@ void anadir_pizza(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -591,7 +584,7 @@ void anadir_pizza(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -600,7 +593,7 @@ void anadir_pizza(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_segundo_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_puerta((*juego).salida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, MASA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, MASA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
   (*juego).comida[(*juego).tope_comida].tipo = PIZZA;
@@ -621,7 +614,7 @@ void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -630,7 +623,7 @@ void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -639,7 +632,7 @@ void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -648,7 +641,7 @@ void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_segundo_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_puerta((*juego).salida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, CARNE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, CARNE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -670,7 +663,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -679,7 +672,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, TOMATE, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -688,7 +681,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, PAN, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -697,7 +690,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, JAMON, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -706,7 +699,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_primer_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, QUESO, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
 
@@ -715,7 +708,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
     (*posicion_ingredientes) = numeros_aleatorios_segundo_cuadrante();
     if (no_hay_obstaculo((*juego).obstaculos, (*juego).tope_obstaculos, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_herramienta((*juego).herramientas, (*juego).tope_herramientas, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && pisa_mesa((*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_ingredientes((*juego).comida, (*juego).tope_comida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col) && no_hay_puerta((*juego).salida, (*posicion_ingredientes).fil, (*posicion_ingredientes).col))
     {
-      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, MILANESA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
+      anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, &(*juego).comida[(*juego).tope_comida].tope_ingredientes, MILANESA, (*posicion_ingredientes).fil, (*posicion_ingredientes).col);
     }
   }
   (*juego).comida[(*juego).tope_comida].tipo = SANDWICH;
@@ -946,7 +939,7 @@ void imprimir_terreno(juego_t juego)
 void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
 {
 
-  if ((movimiento == MOVER_DERECHA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col + 1)))
+  if ((movimiento == MOVER_DERECHA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil, (*jugador).posicion.col + 1)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*jugador).posicion.fil, ((*jugador).posicion.col + 1)))
   {
     (*jugador).posicion.col++;
     if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
@@ -954,7 +947,7 @@ void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
       (*juego).movimientos++;
     }
   }
-  else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*juego).reuben.posicion.fil, ((*juego).reuben.posicion.col - 1)))
+  else if ((movimiento == MOVER_IZQUIERDA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil, (*jugador).posicion.col - 1)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*jugador).posicion.fil, ((*jugador).posicion.col - 1)))
   {
     (*jugador).posicion.col--;
     if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
@@ -962,7 +955,7 @@ void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
       (*juego).movimientos++;
     }
   }
-  else if ((movimiento == MOVER_ABAJO) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*juego).reuben.posicion.fil + 1, ((*juego).reuben.posicion.col)))
+  else if ((movimiento == MOVER_ABAJO) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil + 1, (*jugador).posicion.col)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*jugador).posicion.fil + 1, ((*jugador).posicion.col)))
   {
     (*jugador).posicion.fil++;
     if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
@@ -970,17 +963,13 @@ void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
       (*juego).movimientos++;
     }
   }
-  else if ((movimiento == MOVER_ARRIBA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*juego).reuben.posicion.fil - 1, ((*juego).reuben.posicion.col)))
+  else if ((movimiento == MOVER_ARRIBA) && (no_hay_pared((*juego).paredes, (*juego).tope_paredes, (*juego).mesa, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && (no_hay_fuego((*juego).obstaculos, (*juego).tope_obstaculos, (*jugador).posicion.fil - 1, (*jugador).posicion.col)) && no_hay_horno((*juego).herramientas, (*juego).tope_herramientas, (*jugador).posicion.fil - 1, ((*jugador).posicion.col)))
   {
     (*jugador).posicion.fil--;
     if ((*juego).movimientos < MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO)
     {
       (*juego).movimientos++;
     }
-  }
-  else
-  {
-    printf("%c: Me resulta imposible meterme ahi :u\n", (*jugador).tipo);
   }
 }
 
@@ -1008,7 +997,7 @@ void chequear_puerta(juego_t *juego)
             (*juego).comida_lista[(*juego).tope_comida_lista].esta_cortado = (*juego).comida[i].ingrediente[j].esta_cortado;
             (*juego).tope_comida_lista++;
             (*juego).reuben.objeto_en_mano = MANO_VACIA;
-            printf("R: Una comida menos!\n");
+            printf("R: Un ingrediente menos!\n");
           }
         }
       }
@@ -1118,7 +1107,7 @@ void chequear_aparecer_un_fuego(juego_t *juego)
 // Pre: -
 // Pos: Cambia de personaje
 
-void personaje_activo(juego_t *juego)
+void personaje_activo(juego_t *juego, personaje_t *jugador)
 {
 
   if ((*juego).personaje_activo == STITCH)
@@ -1241,37 +1230,33 @@ void interactuar_con_mesa(comida_t comida[MAX_COMIDA], int tope_comida, coordena
   if ((calcular_distancia((*jugador).posicion.fil, (*jugador).posicion.col, mesa.fil, mesa.col) <= 1))
   {
 
-    int i = 0;
+    int tope = tope_comida -1;
     int j = 0;
 
-    while (i < tope_comida)
+    while (j < comida[tope].tope_ingredientes)
     {
-      while (j < comida[i].tope_ingredientes)
-      {
 
-        if ((comida[i].ingrediente[j].tipo == (*jugador).objeto_en_mano) && no_hay_ingredientes(comida, tope_comida, mesa.fil, mesa.col))
-        {
-          comida[i].ingrediente[j].posicion.fil = mesa.fil;
-          comida[i].ingrediente[j].posicion.col = mesa.col;
-          (*jugador).objeto_en_mano = MANO_VACIA;
-          printf("%c: Deje el ingrediente en la mesa, aunque esta un poco sucia :3\n", (*jugador).tipo);
-        }
-        else if ((comida[i].ingrediente[j].posicion.fil == mesa.fil) && (comida[i].ingrediente[j].posicion.col == mesa.col) && ((*jugador).objeto_en_mano == MANO_VACIA))
-        {
-          (*jugador).objeto_en_mano = comida[i].ingrediente[j].tipo;
-          comida[i].ingrediente[j].posicion.fil = -1;
-          comida[i].ingrediente[j].posicion.col = -1;
-          printf("%c: Tome el ingrediente de la mesa, esta lleno de polvo :v\n", (*jugador).tipo);
-        }
-        else if ((comida[i].ingrediente[j].posicion.fil == mesa.fil) && (comida[i].ingrediente[j].posicion.col == mesa.col) && ((*jugador).objeto_en_mano != MANO_VACIA))
-        {
-          printf("%c: No hay espacio en la mesa!\n", (*jugador).tipo);
-          i = tope_comida;
-          j = comida[i].tope_ingredientes;
-        }
-        j++;
+      if ((comida[tope].ingrediente[j].tipo == (*jugador).objeto_en_mano) && no_hay_ingredientes(comida, tope_comida, mesa.fil, mesa.col))
+      {
+        comida[tope].ingrediente[j].posicion.fil = mesa.fil;
+        comida[tope].ingrediente[j].posicion.col = mesa.col;
+        (*jugador).objeto_en_mano = MANO_VACIA;
+        printf("%c: Deje el ingrediente en la mesa, aunque esta un poco sucia :3\n", (*jugador).tipo);
       }
-      i++;
+      else if ((comida[tope].ingrediente[j].posicion.fil == mesa.fil) && (comida[tope].ingrediente[j].posicion.col == mesa.col) && ((*jugador).objeto_en_mano == MANO_VACIA))
+      {
+        (*jugador).objeto_en_mano = comida[tope].ingrediente[j].tipo;
+        comida[tope].ingrediente[j].posicion.fil = -1;
+        comida[tope].ingrediente[j].posicion.col = -1;
+        printf("%c: Tome el ingrediente de la mesa, esta lleno de polvo :v\n", (*jugador).tipo);
+      }
+      else if ((comida[tope].ingrediente[j].posicion.fil == mesa.fil) && (comida[tope].ingrediente[j].posicion.col == mesa.col) && ((*jugador).objeto_en_mano != MANO_VACIA))
+      {
+        printf("%c: No hay espacio en la mesa!\n", (*jugador).tipo);
+
+        j = comida[tope].tope_ingredientes;
+      }
+      j++;
     }
   }
 }
@@ -1282,32 +1267,25 @@ void interactuar_con_mesa(comida_t comida[MAX_COMIDA], int tope_comida, coordena
 void interactuar_con_horno(juego_t *juego)
 {
 
-  if ((*juego).personaje_activo == REUBEN)
+  for (int i = 0; i < (*juego).tope_herramientas; i++)
   {
-    for (int i = 0; i < (*juego).tope_herramientas; i++)
+
+    if (calcular_distancia((*juego).reuben.posicion.fil, (*juego).reuben.posicion.col, (*juego).herramientas[i].posicion.fil, (*juego).herramientas[i].posicion.col) == 1)
     {
 
-      if (calcular_distancia((*juego).reuben.posicion.fil, (*juego).reuben.posicion.col, (*juego).herramientas[i].posicion.fil, (*juego).herramientas[i].posicion.col) == 1)
+      int tope = (*juego).tope_comida - 1;
+      int k = 0;
+
+      while (k < (*juego).comida[tope].tope_ingredientes)
       {
-
-        int j = 0;
-        int k = 0;
-
-        while (j < (*juego).tope_comida)
+        if (((*juego).reuben.objeto_en_mano == MASA || (*juego).reuben.objeto_en_mano == CARNE || (*juego).reuben.objeto_en_mano == MILANESA) && ((*juego).comida[tope].ingrediente[k].tipo == (*juego).reuben.objeto_en_mano) && !(*juego).comida[tope].ingrediente[k].esta_cocinado)
         {
-          while (k < (*juego).comida[j].tope_ingredientes)
-          {
-            if (((*juego).reuben.objeto_en_mano == MASA || (*juego).reuben.objeto_en_mano == CARNE || (*juego).reuben.objeto_en_mano == MILANESA) && ((*juego).comida[j].ingrediente[k].tipo == (*juego).reuben.objeto_en_mano) && !(*juego).comida[j].ingrediente[k].esta_cocinado)
-            {
-              (*juego).comida[j].ingrediente[k].esta_cocinado = true;
-              printf("R: Cocinadisimo!\n");
-              k = (*juego).comida[j].tope_ingredientes;
-              j = (*juego).tope_comida;
-            }
-            j++;
-            k++;
-          }
+          (*juego).comida[tope].ingrediente[k].esta_cocinado = true;
+          printf("R: Cocinadisimo!\n");
+          k = (*juego).comida[tope].tope_ingredientes;
         }
+
+        k++;
       }
     }
   }
@@ -1318,7 +1296,7 @@ void chequear_jugada(juego_t *juego, char movimiento, personaje_t *jugador)
   switch (movimiento)
   {
   case CAMBIAR_PERSONAJE:
-    personaje_activo(juego);
+    personaje_activo(juego, &(*jugador));
     break;
   case TOMAR_ALIMENTO:
     tomar_ingrediente((*juego).comida, (*juego).tope_comida, (*juego).herramientas, (*juego).tope_herramientas, &(*jugador));
@@ -1372,10 +1350,12 @@ int estado_juego(juego_t juego)
   if (!no_hay_obstaculo(juego.obstaculos, juego.tope_obstaculos, juego.stitch.posicion.fil, juego.stitch.posicion.col) || !no_hay_obstaculo(juego.obstaculos, juego.tope_obstaculos, juego.reuben.posicion.fil, juego.reuben.posicion.col))
   {
     resultado = PERDIO;
+    printf("HAS CAIDO EN UN AGUJERO, GAME OVER.\n");
   }
   else if (condicion_ganadora(juego))
   {
     resultado = GANO;
+    printf("FELICIDADES!!! ENTREGASTE TODAS LAS COMIDAS, GG!\n");
   }
 
   return resultado;
