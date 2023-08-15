@@ -99,7 +99,7 @@ const int MAX_FUEGOS = 1;
 const int MOVIMIENTOS_NECESARIOS_PARA_APARECER_UN_FUEGO = 15;
 
 // Pre: -
-// pos: Añade la localizacion de las paredes al struct juego_t juego
+// pos: Añade la localizacion de las paredes al struct juego_t juego.
 
 void inicializar_nivel_paredes(coordenada_t paredes[MAX_PAREDES], int *tope_paredes)
 {
@@ -121,7 +121,7 @@ void inicializar_nivel_paredes(coordenada_t paredes[MAX_PAREDES], int *tope_pare
 // VALIDACIONES
 
 // Pre: -
-// Pos: Valida que no este por encima de la mesa y por debajo
+// Pos: Valida que no este por encima de la mesa y por debajo.
 
 bool pisa_mesa(int numero_fila_random, int numero_columna_random)
 {
@@ -134,7 +134,7 @@ bool pisa_mesa(int numero_fila_random, int numero_columna_random)
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo PARED en una posicion
+// Pos: Valida que no haya un char tipo PARED en una posicion.
 
 bool no_hay_pared(coordenada_t paredes[MAX_PAREDES], int tope_paredes, coordenada_t mesa, int numero_fila_random, int numero_columna_random)
 {
@@ -151,7 +151,7 @@ bool no_hay_pared(coordenada_t paredes[MAX_PAREDES], int tope_paredes, coordenad
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo OBSTACULOS en una posicion
+// Pos: Valida que no haya un char tipo OBSTACULOS en una posicion.
 
 bool no_hay_obstaculo(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obstaculos, int numero_fila_random, int numero_columna_random)
 {
@@ -168,7 +168,7 @@ bool no_hay_obstaculo(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obstaculos, 
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo OBSTACULO: FUEGO en una posicion
+// Pos: Valida que no haya un char tipo OBSTACULO: FUEGO en una posicion.
 
 bool no_hay_fuego(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obstaculos, int numero_fila_random, int numero_columna_random)
 {
@@ -185,7 +185,7 @@ bool no_hay_fuego(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obstaculos, int 
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo FUEGO en toda la matriz
+// Pos: Valida que no haya un char tipo FUEGO en toda la matriz.
 
 bool hay_fuego_en_alguna_parte(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obstaculos)
 {
@@ -201,7 +201,7 @@ bool hay_fuego_en_alguna_parte(objeto_t obstaculos[MAX_OBSTACULOS], int tope_obs
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo HERRAMIENTA en esa posicion
+// Pos: Valida que no haya un char tipo HERRAMIENTA en esa posicion.
 
 bool no_hay_herramienta(objeto_t herramientas[MAX_HERRAMIENTAS], int tope_herramientas, int numero_fila_random, int numero_columna_random)
 {
@@ -217,7 +217,7 @@ bool no_hay_herramienta(objeto_t herramientas[MAX_HERRAMIENTAS], int tope_herram
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo HERRAMIENTA: HORNO en esa posicion
+// Pos: Valida que no haya un char tipo HERRAMIENTA: HORNO en esa posicion.
 
 bool no_hay_horno(objeto_t herramientas[MAX_HERRAMIENTAS], int tope_herramientas, int numero_fila_random, int numero_columna_random)
 {
@@ -233,7 +233,7 @@ bool no_hay_horno(objeto_t herramientas[MAX_HERRAMIENTAS], int tope_herramientas
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo INGREDIENTE
+// Pos: Valida que no haya un char tipo INGREDIENTE.
 
 bool no_hay_ingredientes(comida_t comida[MAX_COMIDA], int tope_comida, int numero_fila_random, int numero_columna_random)
 {
@@ -252,7 +252,7 @@ bool no_hay_ingredientes(comida_t comida[MAX_COMIDA], int tope_comida, int numer
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo SALIDA
+// Pos: Valida que no haya un char tipo SALIDA.
 
 bool no_hay_puerta(coordenada_t salida, int fila, int columna)
 {
@@ -265,7 +265,7 @@ bool no_hay_puerta(coordenada_t salida, int fila, int columna)
 }
 
 // Pre: -
-// Pos: Valida que no haya un char tipo PERSONAJE
+// Pos: Valida que no haya un char tipo PERSONAJE.
 
 bool no_hay_personaje(personaje_t stitch, personaje_t reuben, int fila, int columna)
 {
@@ -304,7 +304,7 @@ bool condicion_ganadora(juego_t juego)
 // HERRAMIENTAS DE PROGRAMACION
 
 // Pre: -
-// Pos: Calcula la distancia entre dos posiciones que se encuentran en la matriz;
+// Pos: Calcula la distancia entre dos posiciones que se encuentran en la matriz.
 
 int calcular_distancia(int fila1, int columna1, int fila2, int columna2)
 {
@@ -328,8 +328,6 @@ void anadir_ingrediente_particular(comida_t comida[MAX_COMIDA], int tope_comida,
   comida[tope_comida].ingrediente[*tope_ingrediente].esta_cortado = false;
   comida[tope_comida].ingrediente[*tope_ingrediente].esta_cocinado = false;
   (*tope_ingrediente)++;
-  // ejemplo de uso :
-  //   anadir_ingrediente_particular((*juego).comida, (*juego).tope_comida, (*juego).comida[(*juego).tope_comida].tope_ingredientes, LECHUGA, numero_fila_random, numero_columna_random);
 }
 
 // Pre: Pasarle un struct y tope ya inicializado.
@@ -380,13 +378,13 @@ coordenada_t numeros_aleatorios_segundo_cuadrante()
 // AÑADIR OBSTACULOS, HERRAMIENTAS, MESA Y SALIDA
 
 // Pre: -
-// Pos: añade 20 OBSTACULOS del tipo AGUJEROS en el struct
+// Pos: añade 20 OBSTACULOS del tipo AGUJEROS en el struct.
 
 void anadir_agujeros(objeto_t obstaculos[MAX_OBSTACULOS], int *tope_obstaculos, coordenada_t *posicion_agujeros)
 {
   *tope_obstaculos = 0;
 
-  // añade 10 obstaculos al primer cuadrante
+  // añade 10 obstaculos al primer cuadrante.
   while (*tope_obstaculos < MAX_AGUJEROS_POR_CUADRANTE)
   {
     (*posicion_agujeros) = numeros_aleatorios_primer_cuadrante();
@@ -396,7 +394,7 @@ void anadir_agujeros(objeto_t obstaculos[MAX_OBSTACULOS], int *tope_obstaculos, 
     }
   }
 
-  // añade 10 obstaculos al 2do cuadrante
+  // añade 10 obstaculos al 2do cuadrante.
   while (*tope_obstaculos < (2 * MAX_AGUJEROS_POR_CUADRANTE))
   {
     (*posicion_agujeros) = numeros_aleatorios_segundo_cuadrante();
@@ -408,7 +406,7 @@ void anadir_agujeros(objeto_t obstaculos[MAX_OBSTACULOS], int *tope_obstaculos, 
 }
 
 // Pre: -
-// Pos: añade 1 OBSTACULO del tipo FUEGO al cuadrante de stitch
+// Pos: añade 1 OBSTACULO del tipo FUEGO al cuadrante de stitch.
 
 void anadir_fuego_cuadrante_stitch(juego_t *juego, coordenada_t *posicion_fuego)
 {
@@ -423,7 +421,7 @@ void anadir_fuego_cuadrante_stitch(juego_t *juego, coordenada_t *posicion_fuego)
 }
 
 // Pre: -
-// Pos: añade 1 OBSTACULO del tipo FUEGO al cuadrante de reuben
+// Pos: añade 1 OBSTACULO del tipo FUEGO al cuadrante de reuben.
 
 void anadir_fuego_cuadrante_reuben(juego_t *juego, coordenada_t *posicion_fuego)
 {
@@ -438,7 +436,7 @@ void anadir_fuego_cuadrante_reuben(juego_t *juego, coordenada_t *posicion_fuego)
 }
 
 // Pre: -
-// Pos: añade 2 HERRAMIENTAS del tipo CUCHILLOS al cuadrante de stitch
+// Pos: añade 2 HERRAMIENTAS del tipo CUCHILLOS al cuadrante de stitch.
 
 void anadir_cuchillos(juego_t *juego, coordenada_t *posicion_cuchillos)
 {
@@ -457,7 +455,7 @@ void anadir_cuchillos(juego_t *juego, coordenada_t *posicion_cuchillos)
 }
 
 // Pre: -
-// Pos: añade 2 HERRAMIENTAS del tipo HORNO al cuadrante de reuben
+// Pos: añade 2 HERRAMIENTAS del tipo HORNO al cuadrante de reuben.
 
 void anadir_hornos(juego_t *juego, coordenada_t *posicion_hornos)
 {
@@ -474,7 +472,7 @@ void anadir_hornos(juego_t *juego, coordenada_t *posicion_hornos)
 }
 
 // Pre: -
-// Pos: añade 1 HERRAMIENTA del tipo MATAFUEGO al cuadrante de stitch
+// Pos: añade 1 HERRAMIENTA del tipo MATAFUEGO al cuadrante de stitch.
 
 void anadir_matafuegos_cuadrante_stitch(juego_t *juego, coordenada_t *posicion_fuego)
 {
@@ -490,7 +488,7 @@ void anadir_matafuegos_cuadrante_stitch(juego_t *juego, coordenada_t *posicion_f
 }
 
 // Pre: -
-// Pos: añade 1 HERRAMIENTA del tipo MATAFUEGO al cuadrante de reuben
+// Pos: añade 1 HERRAMIENTA del tipo MATAFUEGO al cuadrante de reuben.
 
 void anadir_matafuegos_cuadrante_reuben(juego_t *juego, coordenada_t *posicion_fuego)
 {
@@ -506,7 +504,7 @@ void anadir_matafuegos_cuadrante_reuben(juego_t *juego, coordenada_t *posicion_f
 }
 
 // Pre: -
-// Pos: añade 1 mesa en POSICION_FILA_MESA y POSICION_COLUMNA_MESA y una puerta en el cuadrante de reuben
+// Pos: añade 1 mesa en POSICION_FILA_MESA y POSICION_COLUMNA_MESA y una puerta en el cuadrante de reuben.
 
 void anadir_mesa_y_salida(juego_t *juego, coordenada_t *posicion_puerta)
 {
@@ -532,7 +530,7 @@ void anadir_mesa_y_salida(juego_t *juego, coordenada_t *posicion_puerta)
 // AÑADIR ALIMENTOS
 
 // Pre: -
-// Pos: Añade a un struct del tipo juego_t los ingredientes de un ENSALADA
+// Pos: Añade a un struct del tipo juego_t los ingredientes de un ENSALADA.
 
 void anadir_ensalada(juego_t *juego, coordenada_t *posicion_ingredientes)
 {
@@ -563,7 +561,7 @@ void anadir_ensalada(juego_t *juego, coordenada_t *posicion_ingredientes)
 }
 
 // Pre: -
-// Pos: Añade a un struct del tipo juego_t los ingredientes de un PIZZA
+// Pos: Añade a un struct del tipo juego_t los ingredientes de un PIZZA.
 
 void anadir_pizza(juego_t *juego, coordenada_t *posicion_ingredientes)
 {
@@ -602,7 +600,7 @@ void anadir_pizza(juego_t *juego, coordenada_t *posicion_ingredientes)
 }
 
 // Pre: -
-// Pos: Añade a un struct del tipo juego_t los ingredientes de un HAMBURGUESA
+// Pos: Añade a un struct del tipo juego_t los ingredientes de un HAMBURGUESA.
 
 void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
 {
@@ -651,7 +649,7 @@ void anadir_hamburguesa(juego_t *juego, coordenada_t *posicion_ingredientes)
 }
 
 // Pre: -
-// Pos: Añade a un struct del tipo juego_t los ingredientes de un SANDWICH
+// Pos: Añade a un struct del tipo juego_t los ingredientes de un SANDWICH.
 
 void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
 {
@@ -719,7 +717,7 @@ void anadir_sandwich(juego_t *juego, coordenada_t *posicion_ingredientes)
 // FIN AÑADIR ALIMENTOS
 
 // Pre: -
-// Pos: Inicializa a stitch y reuben en el struct, con una posicion aleatoria en el mapa sin colisionar
+// Pos: Inicializa a stitch y reuben en el struct, con una posicion aleatoria en el mapa sin colisionar.
 
 void anadir_ambos_personajes(juego_t *juego, coordenada_t *posicion_personajes)
 {
@@ -934,7 +932,7 @@ void imprimir_terreno(juego_t juego)
 // CHEQUEOS
 
 // Pre: -
-// Pos: Chequea que el personaje no se meta en la pared ni en el fuego, si el personaje activo es reuben se fija que no colisione con un horno
+// Pos: Chequea que el personaje no se meta en la pared ni en el fuego, si el personaje activo es reuben se fija que no colisione con un horno.
 
 void chequear_movimiento(juego_t *juego, char movimiento, personaje_t *jugador)
 {
@@ -1056,7 +1054,7 @@ void chequear_comidas(juego_t *juego)
 }
 
 // Pre: -
-// Pos: Si el personaje activo se encuentra por encima de un matafuego con sus manos vacias, entonces el personaje toma el matafuegos
+// Pos: Si el personaje activo se encuentra por encima de un matafuego con sus manos vacias, entonces el personaje toma el matafuegos.
 
 void chequear_matafuegos(objeto_t herramientas[MAX_HERRAMIENTAS], int tope_herramientas, personaje_t *jugador)
 {
@@ -1105,7 +1103,7 @@ void chequear_aparecer_un_fuego(juego_t *juego)
 // MOVIMIENTOS
 
 // Pre: -
-// Pos: Cambia de personaje
+// Pos: Cambia de personaje.
 
 void personaje_activo(juego_t *juego, personaje_t *jugador)
 {
@@ -1222,7 +1220,7 @@ void usar_matafuegos(juego_t *juego, personaje_t *jugador)
 }
 
 // Pre: -
-// Pos: Permite a los personajes poner y dejar ingredientes en la mesa
+// Pos: Permite a los personajes poner y dejar ingredientes en la mesa.
 
 void interactuar_con_mesa(comida_t comida[MAX_COMIDA], int tope_comida, coordenada_t mesa, personaje_t *jugador)
 {
@@ -1230,7 +1228,7 @@ void interactuar_con_mesa(comida_t comida[MAX_COMIDA], int tope_comida, coordena
   if ((calcular_distancia((*jugador).posicion.fil, (*jugador).posicion.col, mesa.fil, mesa.col) <= 1))
   {
 
-    int tope = tope_comida -1;
+    int tope = tope_comida - 1;
     int j = 0;
 
     while (j < comida[tope].tope_ingredientes)
@@ -1262,7 +1260,7 @@ void interactuar_con_mesa(comida_t comida[MAX_COMIDA], int tope_comida, coordena
 }
 
 // Pre: -
-// Pos: Permite a Reuben usar el horno
+// Pos: Permite a Reuben usar el horno.
 
 void interactuar_con_horno(juego_t *juego)
 {
@@ -1290,6 +1288,9 @@ void interactuar_con_horno(juego_t *juego)
     }
   }
 }
+
+// Pre: -
+// Pos: Segun el movimiento va a realizar una determinada accion.
 
 void chequear_jugada(juego_t *juego, char movimiento, personaje_t *jugador)
 {

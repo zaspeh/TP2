@@ -62,7 +62,6 @@ void introduccion_al_juego()
     printf("\n");
 }
 
-
 void informacion_por_pantalla(juego_t juego)
 {
     printf("Precio total: %i\n", juego.precio_total);
